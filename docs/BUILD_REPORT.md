@@ -1,17 +1,17 @@
-# Now Playing — build and validation report
+# Now Playing 1.1 — build and validation report
 
-Both production applications are implemented and built. The software verification pipeline passes; this is **not a device-validated release**. Physical custom-GATT pairing, Apple Music behavior, screen-off volume and default-bond restoration remain blocked on a supported phone and Flipper. No device software/settings were changed.
+Both production apps are updated for 45×45 album artwork and five-second metadata scrolling. Control legends are removed; all physical mappings and long Back exit remain. This is a **preview**, not a completed physical phone/Flipper acceptance release.
 
 ## Actual artifacts
 
 | File under dist/ | Bytes | SHA-256 |
 |---|---:|---|
-| `flipper-now-playing-debug.apk` | 938,152 | `197827e2ad523d32c1b03829d4b6ce46145107f6d09cbffe7d93a8f9e6f19fa1` |
-| `flipper-now-playing-release-unsigned.apk` | 677,780 | `e2a13a7a0cedcfefc57cceef3a9eba0e53dc228f38e090e80893cb907984f33c` |
-| `now_playing-fw1.4.3-api87.1.fap` | 22,980 | `12ef06bb2e8d41f136b74505b70fe896421bf5e59e8325085f5fcbffdb4a3102` |
-| `developer-tools/np-testplayer-debug.apk` | 839,147 | `d57a84e6e1a08303b828d6d60224438c1d719e7909214d0723d5b3f4c034004d` |
+| `flipper-now-playing-debug.apk` | 958,501 | `e9f12be9dd107d895794b3e5c0bcbeae0af7cc2446280b32f5831e0080007618` |
+| `flipper-now-playing-release-unsigned.apk` | 682,992 | `0e9adc4aab3d337950db04e4ec02306528c33b1054a8b6b2bf19ac8b9a0cde02` |
+| `now_playing-fw1.4.3-api87.1.fap` | 23,580 | `bbfaa8a68718c1846cfc607f9e112e7cacee8ff332dab4d41994a8e7446fcfab` |
+| `developer-tools/np-testplayer-debug.apk` | 839,665 | `06dcddb2136e29ce8988b6a55444583747c2c70f37667fda927606b9a9e6de67` |
 
-`flipper-now-playing-debug.apk` is installable and development-signed. `flipper-now-playing-release-unsigned.apk` is deliberately unsigned; no release signing key was requested, generated or distributed. The developer-tools APK is a separate controllable synthetic MediaSession fixture. Source ZIP, screenshots, instructions, manifest and checksums are produced by the packaging script after verification.
+The debug APK is installable, uses the original development signing identity and increments versionCode to 2/versionName 1.1. The release APK is unsigned. The FAP targets official firmware 1.4.3/API87.1; the connected device runs Momentum mntm-012 with matching API. No firmware or bonds are erased.
 
 ## Exact build baseline
 
@@ -33,66 +33,51 @@ The selected AGP supports API 36 and Gradle 8.11.1: https://developer.android.co
 
 API symbol CSV SHA-256: `da9f564c06e20cdaa28070d2f9a2a3753774ba0f78b0a72bf4cbae726e5f8f77`.
 
-The packaged FAP has **77 actual undefined imports**, all marked exported (+) in that exact CSV. `audit_artifacts.py` reads `.fapmeta` and verifies API 87.1 rather than inferring it from the filename. The intermediate debug ELF contains an fbt-only symbol stripped from the final FAP; the audit correctly uses the packaged FAP.
+The packaged FAP has **76 actual undefined imports**, all marked exported (+) in that exact CSV. `audit_artifacts.py` reads `.fapmeta` and verifies API 87.1 rather than inferring it from the filename. The intermediate debug ELF contains an fbt-only symbol stripped from the final FAP; the audit correctly uses the packaged FAP.
 
-## Commands and outcomes
+## Commands and results
 
-All commands below finished with exit 0 in the primary project workspace:
-
-```sh
-./scripts/bootstrap.sh --accept-android-sdk-license
-./scripts/doctor.sh
-./scripts/test_all.sh
-```
-
-The test/build pipeline executes:
+`./scripts/test_all.sh` completed with exit 0 after final source changes. It runs:
 
 ```sh
 python3 -m unittest discover -s protocol -v
 python3 scripts/test_host.py
-./android/gradlew -p android --no-daemon :core:test :core:codecJar :app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:assembleRelease :testplayer:assembleDebug
-# In .cache/flipper-firmware, after staging the project's FAP sources:
-./fbt fap_now_playing
-python3 scripts/audit_fap_imports.py
+./scripts/build_android.sh
+./scripts/build_flipper.sh
 python3 scripts/compare_codecs.py
 python3 scripts/audit_artifacts.py
 python3 scripts/validation_stamp.py
 ```
 
-- **PASS:** 27 supplied reference tests.
-- **PASS:** 9 Kotlin core tests, including every golden split, corruption, production state serialization, normalization/clocks, duplicate/expired commands, bounded publication, operation generations/timeouts, stable selection and counter exhaustion.
-- **PASS:** 3 Android-module permission-policy tests for API 26/30/31/33/34/36/37 decision paths. These are unit tests, not emulator lifecycle tests.
-- **PASS:** Android debug lint, **no issues found**; unsigned release lint-vital/build also succeeds.
-- **PASS:** C AddressSanitizer and UndefinedBehaviorSanitizer tests: all 16 vectors/every split/every one-bit corruption, 200,000 noise bytes, parser bounds/timeouts, atomic state rejection, clock wrap/freeze and physical-key reducer/repeat limits.
-- **PASS:** 616 fixed/random valid frames and 619 malformed frames agree between C, Kotlin and the independent reference.
-- **PASS:** GATT return adapter tests both false-on-success and true-on-error against the pinned wrapper's semantics.
-- **PASS:** Seven native 128×64 renderer states plus pixel assertions for icon/marquee gutters, marker and control geometry. Approved/long/reconnecting frames were visually inspected; images use production drawing code and exact pinned native font/rasterizer data.
-- **PASS:** Actual APK package/min/target, absence of prohibited permissions, and debug APK v2 signature verified. Certificate fingerprint is retained in `evidence/apk-signature.txt`; no private key is bundled.
-- **NOT_RUN:** LeakSanitizer (LSan aborts under the environment's ptrace tracing). ASan/UBSan ran with only `detect_leaks=0`; no sanitizer findings were suppressed.
-- **NOT_RUN:** Emulator/platform lifecycle instrumentation and all physical radio/Apple Music tests. See HARDWARE_VALIDATION.md and the mixed-status acceptance matrix.
+- PASS: 30 Python reference tests, retaining original 16 vectors plus 6 new extension fixtures.
+- PASS: 14 Kotlin core tests and 3 Android module unit tests, including fixed artwork vectors/every split, black/white/transparent/dither conversion, bounded decode sampling, malformed artwork and coalesced priority.
+- PASS: C ASan/UBSan, all 22 vectors/every split/every bit corruption, bounded noise, clock/input checks, stale/invalid artwork rejection, track-change clearing and 5s/12px-sec/1.5s scroll boundaries.
+- PASS: 722 valid fixed/random and 731 malformed frames agree across independent reference, production C and Kotlin codecs.
+- PASS: Android debug lint has no issues; debug, unsigned release, test-player and instrumentation APKs built (155 Gradle tasks).
+- PASS: APK package/version/min/target/permissions/signature; FAP API metadata and all 76 imported symbols exported.
+- PASS: Eleven native 128×64 renderer states including missing art and start/4.999s/6s scrolling. Pixel tests preserve artwork/gutters and confirm no displayed controls. Enlarged production renders visually inspected. The cover in host screenshots is an original synthetic test fixture, not downloaded album art or a device capture.
+- PASS: Actual Android artwork-reader instrumentation on the available API28 AOSP emulator: embedded bitmap, center crop/source ownership, missing artwork, rejected HTTP URI and obsolete callback. Both APK installs and the five-check runner completed successfully. This is not a BLE or Apple Music test.
+- NOT_RUN: LeakSanitizer under ptrace; ASan/UBSan use detect_leaks=0, with no other findings suppressed.
+- NOT_RUN: Physical phone-to-Flipper artwork, URI-provider interoperability, screen-off/Android17 volume, latency, bond restoration and endurance. Use HARDWARE_VALIDATION.md.
 
-Full logs and the source/artifact validation stamp are under `build/evidence/` and copied into the release evidence directory. The stamp rejects stale source or binaries during packaging. Earlier compile/lint failures were fixed, not baselined away; the execution log records them.
+Emulator command:
 
-## Implemented runtime behavior
+```sh
+adb -s emulator-5584 install -r dist/flipper-now-playing-debug.apk
+adb -s emulator-5584 install -r android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+adb -s emulator-5584 shell am instrument -w io.github.flippernowplaying.bridge.test/io.github.flippernowplaying.bridge.ArtworkInstrumentation
+```
 
-Android uses its actual media-session APIs, strict Apple Music/selected-package filtering, original metadata preview, ASCII normalization, a user-started connectedDevice foreground service, explicit pairing, fixed 20-byte GATT writes, serialized callbacks/operation timeouts, fresh handshakes/snapshots, bounded coalescing, heartbeat and duplicate-command reservation. No Internet permission, notification-body collection, audio focus/routing API, playback engine, account or backend is present.
+## Implementation and compatibility
 
-Flipper uses a distinct authenticated RX / indicated TX GATT service, factory address byte-2 +2 identity, app-specific bond storage, a confirmation-gated TX worker, bounded RX/command queues, atomic model application, native 128×64 Canvas UI, time projection, all specified key mappings and bounded held volume. Startup checks writable app-data storage; exit joins the worker, fences/unregisters callbacks, restores default keys/profile and only then unloads. Restoration failure retains the FAP with a retry/error screen rather than unloading referenced code.
+Application version 2 is negotiated within the existing FNP1 envelope. New/old peers negotiate v1 without artwork. The optional 282-byte ARTWORK payload is identity-bound, atomically applied and below controls/state in publication priority. Android decodes on a bounded worker and uses fixed 45×45 Bayer dithering. It reads embedded metadata bitmaps or already-readable content URIs; it does not fetch HTTP artwork or request new permissions. No art blocks READY; missing art uses a note placeholder.
 
-## Evidence limits
+The first physical startup also exposed the original root-stat guard defect. The corrected app checks exported storage_sd_status, then probes its own directory; no storage protections were removed. The user observed Waiting for phone after this fix.
 
-The attached NVIDIA SHIELD is API 22 (Android 5.1), below minimum, without Apple Music. No compatible Flipper/phone pair or accelerated emulator was available. Real authenticated discovery, numeric pairing, indication timing, default-bond preservation, OEM background behavior, Android 17 volume, latency, loaded heap/stack and endurance remain unverified. No performance numbers are claimed. The code-level tests and reviews do not exhaustively model every Android/Furi callback interleaving; hardware acceptance remains a release gate.
+## Evidence and remaining limits
 
-The workspace's managed `.git` directory is not a usable Git checkout. The manifest therefore records a source digest and source ZIP rather than inventing a project commit. The upstream firmware commit is real and verified.
+Current logs and validation stamp are in build/evidence and bundled in dist/evidence. Packaging rejects source/artifact changes after validation. The initial 1.0 fresh-source build had identical FAP/unsigned release outputs; retained clean-* evidence describes that older digest, **not** a fresh rebuild of 1.1. The original GitHub Actions run passed; the new release's CI is tracked separately.
 
-## Fresh-source rebuild before final display-name update
+USB installation/readback and loader status are recorded separately from actual phone artwork or control observations. Earlier blanket unavailable-device statements in historical logs refer to the initial environment. An API28 emulator and Momentum Flipper are now present; no physical Android phone is connected through ADB.
 
-A fresh source copy under `/tmp/fnp-clean-m1o34dmm` completed `./scripts/test_all.sh` with exit 0: all **130 Android tasks executed**, all host tests ran, and the FAP was recompiled after `./fbt -c fap_now_playing` removed only generated outputs. Downloaded toolchains/dependencies were shared; this is not a claim of a second cold network bootstrap.
-
-After the final disconnect-readiness correction, the primary pipeline passed again and the updated FAP was compiled again from a cleaned target in the fresh copy. Android sources were unchanged from the 130-task clean build. That source digest matched. The later display-name-only update is separately rebuilt and verified; the archived clean-build evidence identifies the earlier source digest. The **unsigned release APK and FAP were byte-identical** to the primary build. Debug APK hashes differed after clean vs incremental builds because archive entry ordering differed; all corresponding ZIP entry contents were byte-identical. Those development artifacts are individually signed/audited/hashed. `evidence/clean-rebuild.json` and `evidence/debug-rebuild-differences.json` record the comparison. Distribution checksums always identify the actual primary artifacts, not an assumed reproducible debug hash.
-
-## Packaging
-
-`python3 scripts/package_release.py` completed with exit 0. The source ZIP audit found 101 source/documentation files, including the real Gradle wrapper and both real BLE implementations, and excluded caches, generated build trees, bond files and keystores. Every manifest size/hash and all `SHA256SUMS` entries were verified. The UUID initializer and RX/TX byte-12 substitutions were independently checked against the canonical protocol UUIDs; `evidence/uuid-byte-order.json` records the PASS.
-
-The user subsequently authorized GitHub distribution under `villenull/flipper-now-playing`. The first release is explicitly a hardware-unverified preview. Runtime source contains no core TODO/NotImplemented/mock transport paths. The acceptance matrix retains NOT_RUN/BLOCKED for incomplete physical/instrumentation evidence; passing software checks do not relabel those rows.
+The supplied workspace has managed Git metadata; publication uses a separate Git checkout. Source archive/digest identify the local build; the GitHub tag identifies the published source commit. No signing keys, caches or device bond files are included.

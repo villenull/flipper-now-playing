@@ -20,7 +20,7 @@ object Protocol {
   fun byte(i: Int) = p[i].toInt() and 255
   when(t) {
    1,2 -> { size(12); require(u16(p,2)==768 && u16(p,4) in 20..128 && u16(p,6)==0 && u32(p,8)==1L)
-    require(if(t==1) byte(0) in 1..byte(1) else (byte(0)==1&&byte(1)==0)||(byte(0)==0&&byte(1)==1)) }
+    require(if(t==1) byte(0) in 1..byte(1) else (byte(0) in 1..2&&byte(1)==0)||(byte(0)==0&&byte(1)==1)) }
    16,17 -> {
     require(if(t==16) p.size in 44..604 else p.size==36)
     val state=byte(12); val flags=byte(13); val speed=wrap(p).getShort(14).toInt()
@@ -37,6 +37,12 @@ object Protocol {
     }
    }
    18 -> { size(8); require(u32(p,0)>0&&u32(p,4)>0) }
+   19 -> {
+    require(p.size==12||p.size==282)
+    require(u32(p,0)>0&&u32(p,4)>0&&byte(11)==0)
+    require(if(p.size==12) byte(8)==0&&byte(9)==0&&byte(10)==0 else byte(8)==45&&byte(9)==45&&byte(10)==1)
+    for(i in 17 until p.size step 6) require(byte(i) and 224==0)
+   }
    32 -> { size(12); require(u32(p,0)>0&&u32(p,4)>0&&byte(8) in 1..5&&byte(9) in 0..1&&(byte(9)==0||byte(8)>=4)&&u16(p,10) in 1..750) }
    33 -> { size(12); require(u32(p,0)>0&&byte(4) in 0..7&&byte(5)==0&&u16(p,6)==0) }
    48 -> size(0)

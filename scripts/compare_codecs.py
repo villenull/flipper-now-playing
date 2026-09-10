@@ -6,6 +6,7 @@ root=Path(__file__).resolve().parents[1];sys.path.insert(0,str(root/'protocol'))
 from reference_codec import Frame,snapshot_payload,state_payload
 rng=random.Random(82391)
 fixed=[x['frame_hex'] for x in json.loads((root/'protocol/golden_vectors.json').read_text())['vectors']]
+fixed += [x['frame_hex'] for x in json.loads((root/'protocol/artwork_golden_vectors.json').read_text())['vectors']]
 frames=list(fixed)
 for i in range(300):
  duration=rng.randrange(1,315360000000);position=rng.randrange(duration+1);state=rng.randrange(1,7)
@@ -14,6 +15,11 @@ for i in range(300):
  payload=snapshot_payload(title=text(192),artist=text(128),album=text(192),app=text(48),**args)
  frames.append(Frame(16,rng.randrange(1,2**32),i+1,payload).encode().hex())
  frames.append(Frame(17,rng.randrange(1,2**32),i+1,state_payload(**args)).encode().hex())
+for i in range(100):
+ pixels=bytearray(rng.randbytes(270))
+ for j in range(5,270,6):pixels[j]&=31
+ import struct
+ frames.append(Frame(19,1,1000+i,struct.pack('<IIBBBB',1,i+1,45,45,1,0)+pixels).encode().hex())
 bad=[]
 for s in frames:
  b=bytearray.fromhex(s);b[rng.randrange(len(b))]^=1<<rng.randrange(8);bad.append(b.hex())
@@ -21,6 +27,12 @@ for s in frames:
 import binascii,struct
 for offset in (12,13,35):
  b=bytearray.fromhex(fixed[2]);b[16+offset]=255;b[-4:]=struct.pack('<I',binascii.crc32(b[4:-4]));bad.append(b.hex())
+art=bytearray.fromhex(fixed[18])
+for offset,value in [(0,0),(8,44),(9,46),(10,2),(11,1),(17,255)]:
+ b=art.copy()
+ if offset==0:b[16:20]=bytes(4)
+ else:b[16+offset]=value
+ b[-4:]=struct.pack('<I',binascii.crc32(b[4:-4]));bad.append(b.hex())
 all_frames=frames+bad
 java=root/'.cache/jdk-17.0.16+8/bin/java';jars=list((root/'android/core/build/libs').glob('np-codec*.jar'));assert len(jars)==1
 outputs=[]

@@ -20,7 +20,7 @@ typedef struct {
   NpParser parser;
   NpFrame incoming, outgoing;
   uint8_t wire[788];
-  uint8_t last_type;
+  uint8_t last_type, version;
   uint32_t last_payload_crc;
   uint32_t session, last_id, tx_id, last_peer, last_request, error_at,
       error_count;
@@ -80,13 +80,17 @@ static void receive(const NpFrame *f, void *ctx) {
     a->last_type = f->type;
     a->last_payload_crc = np_crc(f->payload, f->length);
     uint8_t ack[12] = {1, 0, 0, 3, 128, 0, 0, 0, 1, 0, 0, 0};
-    if (f->payload[0] != 1) {
+    a->version = f->payload[1] >= 2 ? 2 : 1;
+    ack[0] = a->version;
+    if (f->payload[0] > a->version) {
       ack[0] = 0;
       ack[1] = 1;
     }
     if (!send_frame(a, 2, ack, 12) || ack[1])
       atomic_store(&a->reset, true);
     furi_mutex_acquire(a->lock, FuriWaitForever);
+    a->model.synced = false;
+    a->model.has_artwork = false;
     snprintf(a->status, sizeof(a->status), "Reading player...");
     furi_mutex_release(a->lock);
     return;
@@ -95,7 +99,7 @@ static void receive(const NpFrame *f, void *ctx) {
       f->type == a->last_type &&
       np_crc(f->payload, f->length) == a->last_payload_crc) {
     if (f->type == 1 && !atomic_load(&a->ready)) {
-      const uint8_t ack[12] = {1, 0, 0, 3, 128, 0, 0, 0, 1, 0, 0, 0};
+      const uint8_t ack[12] = {a->version, 0, 0, 3, 128, 0, 0, 0, 1, 0, 0, 0};
       if (!send_frame(a, 2, ack, 12))
         atomic_store(&a->reset, true);
       return;
@@ -149,6 +153,16 @@ static void receive(const NpFrame *f, void *ctx) {
     }
     break;
   }
+  case 0x13:
+    if (a->version != 2 || !atomic_load(&a->ready)) {
+      atomic_store(&a->reset, true);
+      return;
+    }
+    furi_mutex_acquire(a->lock, FuriWaitForever);
+    if (!atomic_load(&a->ble.stopping) && !atomic_load(&a->reset))
+      np_artwork_apply(&a->model, f);
+    furi_mutex_release(a->lock);
+    break;
   case 0x40:
     if (!send_frame(a, 0x41, f->payload, 4))
       atomic_store(&a->reset, true);
@@ -362,8 +376,16 @@ int32_t now_playing_app(void *ctx) {
   view_port_input_callback_set(a->view, input, a);
   gui_add_view_port(gui, a->view, GuiLayerFullscreen);
   bool changed = false;
-  if (storage_common_stat(storage, EXT_PATH(""), NULL) == FSE_OK &&
-      storage_ready(storage) && furi_hal_bt_is_gatt_gap_supported()) {
+  /* FatFs f_stat rejects the volume root (FR_INVALID_NAME). Use the
+   * exported card-status API, then verify our app directory is writable. */
+  const char *startup_error = NULL;
+  if (storage_sd_status(storage) != FSE_OK)
+    startup_error = "SD card not ready";
+  else if (!storage_ready(storage))
+    startup_error = "App data not writable";
+  else if (!furi_hal_bt_is_gatt_gap_supported())
+    startup_error = "BLE stack unavailable";
+  if (!startup_error) {
     bt_disconnect(bt);
     furi_delay_ms(200);
     bt_keys_storage_set_storage_path(bt, APP_DATA_PATH("bt.keys"));
@@ -374,11 +396,14 @@ int32_t now_playing_app(void *ctx) {
       a->worker = furi_thread_alloc_ex("NpTransport", 4096, worker, a);
       furi_thread_start(a->worker);
       furi_hal_bt_start_advertising();
+    } else {
+      startup_error = "BLE profile failed";
     }
   }
   if (!a->worker) {
     furi_mutex_acquire(a->lock, FuriWaitForever);
-    snprintf(a->status, sizeof(a->status), "Check SD / Bluetooth");
+    snprintf(a->status, sizeof(a->status), "%s",
+             startup_error ? startup_error : "Transport start failed");
     furi_mutex_release(a->lock);
     view_port_update(a->view);
   }
@@ -424,8 +449,8 @@ int32_t now_playing_app(void *ctx) {
     if (repeat > 0)
       queue_command(a, repeat, true, now);
     bool animate = a->keys.held || a->overlay[0] ||
-                   strlen(a->model.title) > 13 ||
-                   strlen(a->model.artist) > 20 || strlen(a->model.album) > 23;
+                   strlen(a->model.title) > 8 || strlen(a->model.artist) > 12 ||
+                   strlen(a->model.album) > 12;
     bool refresh = animate ? (now - last_draw >= 100)
                            : (a->model.state == 3 && a->model.fresh &&
                               now - last_draw >= 1000);

@@ -184,3 +184,57 @@ A frame-level ACK/retransmission protocol is intentionally not added on top of G
 Run `python -m unittest discover -s protocol -v` from the package root. Fixtures include the approved example, paused/remaining state, unknown duration, no player, maximum-length text, media commands, and control messages. C and Kotlin must decode the committed bytes and re-encode exactly; also compare their outputs against each other with randomized valid models.
 
 Do not generate expected bytes using the same production encoder inside the test asserting those bytes. Golden fixtures are fixed reviewable expectations. Tests must cover minimum MTU, arbitrary splitting, concatenated frames, invalid lengths, reserved bits, stale epochs/sequences, duplicate commands, mid-frame disconnect, and expired queue entries.
+
+## 5.16 Artwork application version 2 (user-authorized extension)
+
+This section supersedes the v1-only HELLO selection rule above; all original v1
+frames and golden vectors stay unchanged. Frame magic/version remain `FNP1`/1,
+feature bits remain 1, and parser/characteristic limits are unchanged. A new
+phone advertises application range [1,2]. A new Flipper chooses 2 if offered,
+otherwise 1 if offered, otherwise rejects with selected=0/status=1. Successful
+HELLO_ACK permits selected 1 or 2. Repeated HELLO returns the same selection.
+A legacy phone offering [1,1] gets version 1; a legacy Flipper selects 1 from
+[1,2]. **ARTWORK MUST NOT be sent or accepted unless version 2 was selected.**
+
+ARTWORK is type `0x13`, phone → Flipper, exactly 12 or 282 bytes:
+
+| Offset | Type | Meaning |
+|---|---|---|
+| 0 | u32 | nonzero player epoch |
+| 4 | u32 | nonzero track revision |
+| 8 | u8 | width: 45 for present, 0 for absent |
+| 9 | u8 | height: 45 for present, 0 for absent |
+| 10 | u8 | present: 1 or 0 |
+| 11 | u8 | reserved, zero |
+| 12 | 270 bytes | only when present; 45 rows × 6 bytes, LSB-first x pixels, 1=black |
+
+Bits 5..7 of the last byte of every row are zero. Absence has no bitmap bytes.
+Reject any other length, size, flag, padding or zero identity. No partial image
+is ever applied. Apply only after SNAPSHOT_APPLIED has been sent, when the current
+model is fresh and both epoch and track revision match; discard stale artwork
+without changing metadata or reconnecting. Clear artwork when snapshot identity
+changes or a new connection snapshot is first applied. Preserve it on same-track
+metadata/state refreshes. An explicit absent frame restores the placeholder.
+
+Artwork is optional and never blocks READY. The phone keeps one replaceable
+pending artwork frame, below command results, snapshots, state and heartbeat in
+priority. New snapshots invalidate pending artwork. Frames remain non-interleaved,
+IDs allocated on selection, writes fixed at 20 bytes. There is no artwork ACK or
+retransmission; each new connection sends current snapshot and current artwork.
+The 302-byte present frame fits existing 788-byte bounded parser buffers.
+
+Android reads selected-session embedded album/art/display bitmaps or already
+readable `content://` artwork. No HTTP/file fetches, added permissions or network
+component. Local URI input is capped at 4 MiB, dimensions at 16384 per axis and
+64 million source pixels, with sampled decoding and a 45×45 conversion target.
+Only one decode executes and one newest request waits. Generation and identity
+checks discard obsolete completion callbacks. Images are center-cropped and
+converted to one bit with deterministic 4×4 Bayer dithering over white.
+
+The user-approved UI now uses 45×45 artwork and right-hand title/artist/album
+rows, with full-width time/progress below and no control legend. Physical mappings
+and long Back exit are unchanged. Each overflowing row independently waits 5000 ms
+at its start, scrolls at 12 pixels/sec, waits 1500 ms at its end and repeats.
+Fitting rows do not move. Track or metadata changes restart the pause; periodic
+state and artwork updates do not. This explicitly replaces the original UI's
+one-row-at-a-time shorter pause and displayed button indicators.

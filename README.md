@@ -2,7 +2,7 @@
 
 A small independent Android media-session helper and an external Flipper Zero app. Dedicated authenticated BLE GATT; no Internet permission, server, Apple credentials, firmware fork, root or changes to Apple Music/the official Flipper app.
 
-**[Download the Android APK](https://github.com/villenull/flipper-now-playing/releases/download/v1.0.0-preview.1/flipper-now-playing-debug.apk)** · **[Download the Flipper app](https://github.com/villenull/flipper-now-playing/releases/download/v1.0.0-preview.1/now_playing-fw1.4.3-api87.1.fap)**
+**[Download the Android APK](https://github.com/villenull/flipper-now-playing/releases/download/v1.1.0-preview.1/flipper-now-playing-debug.apk)** · **[Download the Flipper app](https://github.com/villenull/flipper-now-playing/releases/download/v1.1.0-preview.1/now_playing-fw1.4.3-api87.1.fap)**
 
 Open the APK link on an Android 8.0+ phone, download it, then tap it to install. This preview is built and software-tested; physical BLE/Apple Music acceptance remains unverified. See the release notes before use.
 
@@ -17,4 +17,6 @@ python3 scripts/package_release.py
 
 Review the Android SDK license before passing the explicit acceptance flag. Toolchains are pinned in `.toolchains.lock.json` and installed only under `.cache/`. Builds/tests never install onto a device or flash firmware. Runtime source is under `android/` and `flipper/now_playing/`; the supplied normative handoff remains in `docs/01_…` through `docs/10_…`.
 
-On Flipper: Up/Down volume; Left/Right previous/next; OK play/pause; **hold Back to exit**. The 128×64 view includes title, artist, album, progress and elapsed/total or remaining time. App-specific bonds remain separate; default profile and key path are restored before unload.
+On Flipper: Up/Down volume; Left/Right previous/next; OK play/pause; **hold Back to exit**. The 128×64 view includes a 45×45 monochrome album cover, title/artist/album scrolling after a five-second pause, progress and elapsed/total or remaining time. Button indicators are omitted; physical controls remain unchanged. App-specific bonds remain separate; default profile and key path are restored before unload.
+
+Artwork requires the **1.1 APK and FAP**. Older versions can still connect without artwork. When the selected player does not expose a readable cover, a music-note placeholder appears. Install the updated APK over the existing helper, then press Start again; no uninstall or bond reset is required.

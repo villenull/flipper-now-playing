@@ -9,6 +9,11 @@ import io.github.flippernowplaying.core.MediaState
 import io.github.flippernowplaying.core.PlayerSelector
 
 class MediaSessionRepository(private val context: Context,private val h: Handler,private val changed: (Boolean)->Unit,private val problem: (String)->Unit) {
+ private val artworkReader=ArtworkReader(context,h)
+ private var artworkDirty=true
+ var artwork: ByteArray?=null;private set
+ fun close() { stop();artworkReader.close() }
+ private fun invalidateArtwork() { artworkReader.invalidate();artwork=null;artworkDirty=true }
  private val manager=context.getSystemService(MediaSessionManager::class.java)
  private val component=ComponentName(context,MediaAccessService::class.java)
  private val prefs=context.getSharedPreferences("settings",Context.MODE_PRIVATE)
@@ -18,9 +23,9 @@ class MediaSessionRepository(private val context: Context,private val h: Handler
  private val sessions=MediaSessionManager.OnActiveSessionsChangedListener { list -> controllers=list.orEmpty();select() }
  fun start() { try { if(!registered) { manager.addOnActiveSessionsChangedListener(sessions,component,h);registered=true };controllers=manager.getActiveSessions(component);select() } catch(_:SecurityException) { revoke() } }
  fun stop() { if(registered) { try { manager.removeOnActiveSessionsChangedListener(sessions) } catch(_:SecurityException) { };registered=false };detach();controllers=emptyList() }
- private fun detach() { callback?.let { controller?.unregisterCallback(it) };callback=null;controller=null }
+ private fun detach() { invalidateArtwork(); callback?.let { controller?.unregisterCallback(it) };callback=null;controller=null }
  fun revoke() { stop();epoch=0;revision=0;identity=null;problem("Phone needs notification access");changed(true) }
- fun resetConnection() { epochCounter=0;epoch=if(controller==null)0 else ++epochCounter;revision=if(controller==null)0 else 1;identity=null }
+ fun resetConnection() { invalidateArtwork(); epochCounter=0;epoch=if(controller==null)0 else ++epochCounter;revision=if(controller==null)0 else 1;identity=null }
  fun refresh() { start() }
  private fun select() {
   val mode=prefs.getString("player","com.apple.android.music")!!
@@ -37,7 +42,7 @@ class MediaSessionRepository(private val context: Context,private val h: Handler
   val token=selected.sessionToken
   callback=object: MediaController.Callback() {
    private fun update(full: Boolean) { if(controller?.sessionToken==token)changed(full) }
-   override fun onMetadataChanged(metadata: MediaMetadata?)=update(true)
+   override fun onMetadataChanged(metadata: MediaMetadata?) { if(controller?.sessionToken==token) { invalidateArtwork();update(true) } }
    override fun onPlaybackStateChanged(state: PlaybackState?) { if(controller?.sessionToken==token) { select();update(false) } }
    override fun onAudioInfoChanged(info: MediaController.PlaybackInfo)=update(false)
    override fun onSessionDestroyed() { if(controller?.sessionToken==token) { controllers=controllers.filter { it.sessionToken!=token };select() } }
@@ -61,7 +66,16 @@ class MediaSessionRepository(private val context: Context,private val h: Handler
   val artist=m?.getString(MediaMetadata.METADATA_KEY_ARTIST)?:m?.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST)
   val album=m?.getString(MediaMetadata.METADATA_KEY_ALBUM)
   val key=listOf(m?.getString(MediaMetadata.METADATA_KEY_MEDIA_ID),p?.activeQueueItemId,title,artist,album)
-  if(identity!=null&&identity!=key) { if(revision==0xffffffffL) { problem("Counter exhausted");return MediaState() };revision++ };identity=key
+  if(identity!=null&&identity!=key) { if(revision==0xffffffffL) { problem("Counter exhausted");return MediaState() };revision++;invalidateArtwork() };identity=key
+  if(artworkDirty) {
+   artworkDirty=false
+   val requestedEpoch=epoch;val requestedRevision=revision;val requestedToken=c.sessionToken
+   artworkReader.read(m) { bytes ->
+    if(controller?.sessionToken==requestedToken&&epoch==requestedEpoch&&revision==requestedRevision) {
+     if(!(artwork?.contentEquals(bytes?:byteArrayOf())?: (bytes==null))) { artwork=bytes;changed(true) }
+    }
+   }
+  }
   val actions=p?.actions?:0
   val toggle=if(state==3) PlaybackState.ACTION_PAUSE else PlaybackState.ACTION_PLAY
   var caps=0

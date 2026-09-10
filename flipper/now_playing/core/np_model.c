@@ -11,6 +11,11 @@ int np_model_apply(NpModel *m, const NpFrame *f, uint32_t now) {
   if (m->synced && seq <= m->seq)
     return 0;
   if (f->type == 16) {
+    if (!m->synced || epoch != m->epoch || rev != m->revision || !epoch) {
+      m->has_artwork = false;
+      memset(m->artwork, 0, sizeof(m->artwork));
+      m->scroll_anchor = now;
+    }
     const size_t lengths[4] = {np_u16(p + 36), np_u16(p + 38), np_u16(p + 40),
                                np_u16(p + 42)};
     char *fields[4] = {m->title, m->artist, m->album, m->app};
@@ -113,4 +118,29 @@ int np_input_tick(NpInput *i, uint32_t now, bool ready) {
     return 0;
   i->next = now + 125;
   return i->repeat == 0 ? 4 : 5;
+}
+
+int np_artwork_apply(NpModel *m, const NpFrame *f) {
+  if (f->type != 19 || !np_validate(19, f->payload, f->length))
+    return -1;
+  if (!m->synced || !m->fresh || !m->epoch || np_u32(f->payload) != m->epoch ||
+      np_u32(f->payload + 4) != m->revision)
+    return 0;
+  m->has_artwork = f->payload[10] == 1;
+  if (m->has_artwork)
+    memcpy(m->artwork, f->payload + 12, sizeof(m->artwork));
+  else
+    memset(m->artwork, 0, sizeof(m->artwork));
+  return 1;
+}
+int np_scroll_offset(int overflow, uint32_t elapsed) {
+  if (overflow <= 0)
+    return 0;
+  uint32_t moving = ((uint32_t)overflow * 1000 + 11) / 12;
+  elapsed %= 5000 + moving + 1500;
+  if (elapsed < 5000)
+    return 0;
+  if (elapsed >= 5000 + moving)
+    return overflow;
+  return (int)((elapsed - 5000) * 12 / 1000);
 }

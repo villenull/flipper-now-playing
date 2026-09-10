@@ -13,7 +13,7 @@ class BridgeService: Service() {
   @Volatile var players=listOf<String>();private set
   @Volatile private var instance: BridgeService?=null
   private val diagnostics=ArrayDeque<String>()
-  @Synchronized fun report(): String = "Now Playing 1.0\nAndroid API ${Build.VERSION.SDK_INT}\n"+diagnostics.joinToString("\n")
+  @Synchronized fun report(): String = "Now Playing 1.1\nAndroid API ${Build.VERSION.SDK_INT}\n"+diagnostics.joinToString("\n")
   fun accessChanged(available: Boolean) { instance?.let { s -> s.h.post { if(available)s.media.start() else s.media.revoke() } } }
   fun settingsChanged() { instance?.let { s->s.h.post { s.media.refresh();s.publish(true) } } }
  }
@@ -71,15 +71,19 @@ class BridgeService: Service() {
   val snapshot=full||sample.epoch!=lastEpoch||sample.revision!=lastRevision
   lastEpoch=sample.epoch;lastRevision=sample.revision
   if(snapshot) {
-   ble?.snapshot { media.sample().payload(nextSeq(),now(),true) }
-   ble?.enqueue(17,{ media.sample().payload(nextSeq(),now(),false) })
-  } else ble?.enqueue(17,{ media.sample().payload(nextSeq(),now(),false) })
+   ble?.snapshot { sample.payload(nextSeq(),now(),true) }
+   ble?.enqueue(17,{ sample.payload(nextSeq(),now(),false) })
+   if(ble?.supportsArtwork==true&&sample.epoch>0) {
+    val art=Artwork.payload(sample.epoch,sample.revision,media.artwork)
+    ble?.enqueue(19,{ art })
+   }
+  } else ble?.enqueue(17,{ sample.payload(nextSeq(),now(),false) })
  }
  private val periodic=object: Runnable { override fun run() { if(!armed)return;media.refresh();publish(false);h.postDelayed(this,10000) } }
  private val heartbeat=object: Runnable { override fun run() { if(!armed)return;ble?.enqueue(64,{ Protocol.buffer(4).putInt(now().toInt()).array() });h.postDelayed(this,15000) } }
  override fun onDestroy() {
   instance=null;armed=false
-  h.post { h.removeCallbacksAndMessages(null);ble?.stop();media.stop();commands.reset();thread.quitSafely() }
+  h.post { h.removeCallbacksAndMessages(null);ble?.stop();media.close();commands.reset();thread.quitSafely() }
   stopForeground(STOP_FOREGROUND_REMOVE);status="STOPPED";preview="";super.onDestroy()
  }
  override fun onBind(intent: Intent?): IBinder?=null

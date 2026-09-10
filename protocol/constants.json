@@ -37,7 +37,8 @@
     "PING": 64,
     "PONG": 65,
     "ERROR": 126,
-    "BYE": 127
+    "BYE": 127,
+    "ARTWORK": 19
   },
   "commands": {
     "PLAY_PAUSE": 1,
@@ -86,5 +87,17 @@
   "layout": {
     "width": 128,
     "height": 64
+  },
+  "application_versions": [
+    1,
+    2
+  ],
+  "artwork": {
+    "width": 45,
+    "height": 45,
+    "stride_bytes": 6,
+    "pixel_bytes": 270,
+    "payload_bytes": 282,
+    "bit_order": "LSB first; 1 black; row padding zero"
   }
 }

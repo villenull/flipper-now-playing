@@ -60,6 +60,19 @@ int main(int argc, char **argv) {
   NpModel m = {0};
   if (!np_decode(bytes, n, &f) || np_model_apply(&m, &f, 0) != 1)
     return 7;
+  /* Synthetic album fixture: a sun above layered hills, never runtime art. */
+  for (int y = 0; y < 45; y++)
+    for (int x = 0; x < 45; x++) {
+      int dx = x - 31, dy = y - 12;
+      bool sun = dx * dx + dy * dy < 49;
+      bool mountain = y > 24 + abs(x - 16) / 2 || y > 28 + abs(x - 38) / 2;
+      bool sky = ((x + 3 * y) % 13 == 0) && !sun;
+      if (mountain || sky)
+        m.artwork[y * 6 + x / 8] |= 1u << (x % 8);
+    }
+  m.has_artwork = true;
+  if (!strcmp(argv[2], "no-artwork"))
+    m.has_artwork = false;
   const char *overlay = "";
   if (!strcmp(argv[2], "paused")) {
     m.state = 2;
@@ -85,8 +98,11 @@ int main(int argc, char **argv) {
   u8g2_SetFontMode(&c.u8g2, 1);
   u8g2_SetFontPosBaseline(&c.u8g2);
   u8g2_SetDrawColor(&c.u8g2, 1);
-  np_view_draw(&c, &m, !strcmp(argv[2], "long") ? 6500 : 0, "Waiting for phone",
-               overlay, 0);
+  uint32_t render_at = !strcmp(argv[2], "long")            ? 6500
+                       : !strcmp(argv[2], "scroll-wait")   ? 4999
+                       : !strcmp(argv[2], "scroll-moving") ? 6000
+                                                           : 0;
+  np_view_draw(&c, &m, render_at, "Waiting for phone", overlay, 0);
   FILE *out = fopen(argv[3], "wb");
   if (!out)
     return 8;

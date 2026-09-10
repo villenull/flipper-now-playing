@@ -32,10 +32,12 @@ int main(int argc, char **argv) {
     if (f.type == 16) {
       NpModel model = {0};
       assert(np_model_apply(&model, &f, 100) == 1);
-      if(!strcmp(model.title,"Get Lucky")) {
-        assert(model.epoch==1&&model.revision==1&&model.seq==1);
-        assert(model.position==102000&&model.duration==248000&&model.speed==1000&&model.caps==31);
-        assert(!strcmp(model.artist,"Daft Punk")&&!strcmp(model.album,"Random Access Memories"));
+      if (!strcmp(model.title, "Get Lucky")) {
+        assert(model.epoch == 1 && model.revision == 1 && model.seq == 1);
+        assert(model.position == 102000 && model.duration == 248000 &&
+               model.speed == 1000 && model.caps == 31);
+        assert(!strcmp(model.artist, "Daft Punk") &&
+               !strcmp(model.album, "Random Access Memories"));
       }
       NpModel saved = model;
       assert(np_model_apply(&model, &f, 1000) == 0);
@@ -81,7 +83,7 @@ int main(int argc, char **argv) {
     assert(!p.used);
   }
   fclose(file);
-  assert(vectors == 16);
+  assert(vectors == 22);
   NpParser p = {0};
   srand(1123);
   for (unsigned i = 0; i < 200000; i++) {
@@ -116,6 +118,50 @@ int main(int argc, char **argv) {
   assert(!strcmp(label, "1:01:01"));
   np_time(label, sizeof(label), 0, false, false);
   assert(!strcmp(label, "--:--"));
+  assert(np_scroll_offset(24, 0) == 0);
+  assert(np_scroll_offset(24, 4999) == 0);
+  assert(np_scroll_offset(24, 5000) == 0);
+  assert(np_scroll_offset(24, 6000) == 12);
+  assert(np_scroll_offset(24, 7000) == 24);
+  assert(np_scroll_offset(24, 8499) == 24);
+  assert(np_scroll_offset(24, 8500) == 0);
+  assert(np_scroll_offset(0, UINT32_MAX) == 0);
+  NpFrame art = {.type = 19, .length = 282};
+  np_put(art.payload, 1, 4);
+  np_put(art.payload + 4, 1, 4);
+  art.payload[8] = art.payload[9] = 45;
+  art.payload[10] = 1;
+  art.payload[12] = 1;
+  assert(np_artwork_apply(&m, &art) == 1 && m.has_artwork && m.artwork[0] == 1);
+  NpModel art_saved = m;
+  art.payload[17] = 128;
+  assert(np_artwork_apply(&m, &art) == -1 &&
+         !memcmp(&m, &art_saved, sizeof(m)));
+  art.payload[17] = 0;
+  np_put(art.payload + 4, 2, 4);
+  assert(np_artwork_apply(&m, &art) == 0 && !memcmp(&m, &art_saved, sizeof(m)));
+  np_put(art.payload + 4, 1, 4);
+  art.length = 12;
+  art.payload[8] = art.payload[9] = art.payload[10] = 0;
+  assert(np_artwork_apply(&m, &art) == 1 && !m.has_artwork && !m.artwork[0]);
+  m.fresh = false;
+  art.length = 282;
+  art.payload[8] = art.payload[9] = 45;
+  art.payload[10] = 1;
+  assert(np_artwork_apply(&m, &art) == 0 && !m.has_artwork);
+  m = art_saved;
+  NpFrame changed_track = {.type = 16, .length = 44};
+  np_put(changed_track.payload, 1, 4);
+  np_put(changed_track.payload + 4, 2, 4);
+  np_put(changed_track.payload + 8, 2, 4);
+  changed_track.payload[12] = 2;
+  assert(np_model_apply(&m, &changed_track, 9000) == 1);
+  assert(!m.has_artwork && !m.artwork[0] && m.scroll_anchor == 9000);
+  m.has_artwork = true;
+  m.artwork[0] = 1;
+  np_put(changed_track.payload + 8, 3, 4);
+  assert(np_model_apply(&m, &changed_track, 10000) == 1);
+  assert(m.has_artwork && m.artwork[0] == 1 && m.scroll_anchor == 9000);
   NpInput input = {.repeat = -1};
   assert(np_input(&input, 4, 0, 0, true) == 1);
   assert(np_input(&input, 4, 0, 0, true) == 0);

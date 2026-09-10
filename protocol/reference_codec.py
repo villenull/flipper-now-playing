@@ -26,7 +26,7 @@ RX_UUID = "8f9a1001-6d8a-4f1b-a6e6-3b4c5d6e7f80"
 TX_UUID = "8f9a1002-6d8a-4f1b-a6e6-3b4c5d6e7f80"
 TYPES = {
     "HELLO": 0x01, "HELLO_ACK": 0x02,
-    "SNAPSHOT": 0x10, "STATE": 0x11, "SNAPSHOT_APPLIED": 0x12,
+    "ARTWORK": 0x13, "SNAPSHOT": 0x10, "STATE": 0x11, "SNAPSHOT_APPLIED": 0x12,
     "COMMAND": 0x20, "COMMAND_RESULT": 0x21,
     "REQUEST_SNAPSHOT": 0x30, "PING": 0x40, "PONG": 0x41,
     "ERROR": 0x7E, "BYE": 0x7F,
@@ -149,11 +149,18 @@ def validate_payload(kind: int, payload: bytes) -> None:
         if kind == TYPES["HELLO"]:
             _require(1 <= a <= b <= 255, "HELLO version range")
         else:
-            _require((b == 0 and a == 1) or (b == 1 and a == 0), "HELLO_ACK version/status")
+            _require((b == 0 and a in (1, 2)) or (b == 1 and a == 0), "HELLO_ACK version/status")
     elif kind == TYPES["SNAPSHOT_APPLIED"]:
         _require(len(payload) == 8, "SNAPSHOT_APPLIED length")
         ref, seq = struct.unpack("<II", payload)
         _require(ref > 0 and seq > 0, "SNAPSHOT_APPLIED IDs")
+    elif kind == TYPES["ARTWORK"]:
+        _require(len(payload) in (12, 282), "ARTWORK length")
+        epoch, revision, width, height, present, reserved = struct.unpack_from("<IIBBBB", payload)
+        _require(epoch > 0 and revision > 0 and reserved == 0, "ARTWORK identity/reserved")
+        _require((len(payload) == 12 and (width, height, present) == (0, 0, 0)) or
+                 (len(payload) == 282 and (width, height, present) == (45, 45, 1)), "ARTWORK format")
+        _require(all(b & 0xe0 == 0 for b in payload[17::6]), "ARTWORK row padding")
     elif kind == TYPES["COMMAND"]:
         _require(len(payload) == 12, "COMMAND length")
         epoch, rev, cmd, origin, ttl = struct.unpack("<IIBBH", payload)

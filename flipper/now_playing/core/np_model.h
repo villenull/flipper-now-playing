@@ -7,6 +7,8 @@ typedef struct {
   uint16_t caps;
   uint64_t position, duration;
   char title[193], artist[129], album[193], app[49];
+  uint8_t artwork[270];
+  bool has_artwork;
   bool synced, fresh;
 } NpModel;
 /* 1 applied, 0 old/duplicate, -1 mismatched STATE; syntax is validated first.
@@ -24,3 +26,7 @@ typedef struct {
  * short,3 long,4 repeat */
 int np_input(NpInput *input, int key, int event, uint32_t now, bool ready);
 int np_input_tick(NpInput *input, uint32_t now, bool ready);
+
+/* Artwork is applied only to the current fresh snapshot identity. */
+int np_artwork_apply(NpModel *m, const NpFrame *f);
+int np_scroll_offset(int overflow, uint32_t elapsed);

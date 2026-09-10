@@ -25,3 +25,14 @@ Commands (exit 0):
 Use `tests/integration/README.md`, its scripted scenario JSON and `docs/acceptance_matrix.csv`. Record tested artifact hashes and actual device/app/firmware versions before marking any hardware row PASS. The test-player APK is under `dist/developer-tools/`; it is separate from the production helper.
 
 The seven production-render images are **host simulations at 128×64**, not device captures. They demonstrate layout and native rasterization, not physical display or radio behavior.
+
+## Subsequent USB installation (2026-09-10)
+A physical Flipper became available after the initial preview. User-authorized copy to `/ext/apps/Bluetooth/now_playing.fap` passed full 22,980-byte readback verification. Device runs Momentum mntm-012 / API 87.1, not the official-firmware acceptance baseline. No firmware/settings/bond changes were made. App launch, BLE pairing, controls and cleanup remain NOT_RUN; this installation does not change their acceptance status. Local evidence: `build/evidence/device-install.json`.
+
+### Startup defect corrected
+First launch failed at SD root stat; CLI reproduced invalid name/path. Corrected FAP uses storage_sd_status. Normal long-Back exit, replacement readback, loader running and app-directory creation observed. On-screen readiness/pairing remain pending. Evidence: build/evidence/device-startup-fix.json.
+
+- User confirmed corrected app displays **Waiting for phone**. Startup screen PASS on Momentum mntm-012; Android BLE pairing and media controls still pending.
+
+## 1.1 artwork update
+The API28 AOSP emulator now passes 5 actual Android ArtworkReader checks: embedded bitmap, center crop/borrowed ownership, missing image, no HTTP fetch, stale callback. This does not validate BLE. Physical artwork, rapid-skip correspondence, content-provider availability, Android17 volume and full pairing/cleanup remain open. User must update the physical phone APK; it is not connected over ADB.

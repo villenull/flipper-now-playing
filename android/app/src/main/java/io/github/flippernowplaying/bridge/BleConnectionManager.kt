@@ -26,6 +26,7 @@ class BleConnectionManager(private val context: Context,private val h: Handler,p
  private val commandIds=ArrayDeque<Long>()
  private var snapshotId=0L; private var snapshotSeq=0L
  var ready=false; private set
+ var supportsArtwork=false; private set
  private fun now()=SystemClock.elapsedRealtime()
  private fun state(s: String) { stage=s; status(s) }
  private fun safe(block: ()->Unit) { try { block() } catch(_: SecurityException) { stop(); status("NEEDS_PERMISSION: repair Bluetooth access") } catch(_: IllegalArgumentException) { fail("Invalid device or protocol") } catch(_: CounterExhausted) { fail("Connection counter exhausted") } }
@@ -60,7 +61,7 @@ class BleConnectionManager(private val context: Context,private val h: Handler,p
   if(!auto) h.postDelayed({ if(!stopped&&gen==generation&&stage=="CONNECTING") fail("Connection timeout") },15000)
  }
  private fun close() {
-  generation++; operations.reset(); ready=false; rx=null;tx=null; active=null;sent=null;offset=0
+  generation++; operations.reset(); ready=false; supportsArtwork=false; rx=null;tx=null; active=null;sent=null;offset=0
   publisher.clear(); parser.reset(); commandIds.clear(); session=0;id=0;lastId=0;snapshotId=0;snapshotSeq=0
   val old=gatt;gatt=null
   try { old?.disconnect() } catch(_:SecurityException) { } finally { try { old?.close() } catch(_:SecurityException) { } }
@@ -94,7 +95,7 @@ class BleConnectionManager(private val context: Context,private val h: Handler,p
  }
  private fun hello() {
   state("HANDSHAKING"); lastPeer=now();errorAt=now();errorBase=parser.errors
-  enqueue(1,{ byteArrayOf(1,1,0,3,-128,0,0,0,1,0,0,0) })
+  enqueue(1,{ byteArrayOf(1,2,0,3,-128,0,0,0,1,0,0,0) })
   val gen=generation;h.postDelayed({ if(gen==generation&&stage=="HANDSHAKING") fail("HELLO acknowledgement timeout") },5000)
  }
  fun enqueue(type: Int,payload: ()->ByteArray,onSent: (Long)->Unit={}) {
@@ -137,8 +138,8 @@ class BleConnectionManager(private val context: Context,private val h: Handler,p
   }
   lastId=maxOf(lastId,f.id);lastPeer=at
   when(f.type) {
-   2->{ if(stage!="HANDSHAKING"||f.id!=1L||f.payload[0]!=1.toByte()||f.payload[1]!=0.toByte())return fail("Protocol version or handshake rejected")
-    state("SYNCING");synced() }
+   2->{ if(stage!="HANDSHAKING"||f.id!=1L||f.payload[0].toInt() !in 1..2||f.payload[1]!=0.toByte())return fail("Protocol version or handshake rejected")
+    supportsArtwork=f.payload[0]==2.toByte();state("SYNCING");synced() }
    18->{ if(Protocol.u32(f.payload,0)==snapshotId&&Protocol.u32(f.payload,4)==snapshotSeq) { ready=true;retry=0;state("READY") } }
    127->fail("Flipper closed")
    126->fail("Peer protocol error ${Protocol.u16(f.payload,4)}")

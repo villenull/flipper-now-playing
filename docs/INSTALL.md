@@ -46,3 +46,9 @@ python3 scripts/package_release.py
 ```
 
 Review https://developer.android.com/studio/terms before supplying the license flag. Dependencies live in `.cache/`; no global SDK or system packages are rewritten. The firmware source checkout is a build dependency, not firmware to flash. Exact versions/archive checksums are in `.toolchains.lock.json`. The scripts never install onto a device as part of build/test/package.
+
+## Update to 1.1 (album artwork)
+
+Stop the Android helper, install the new debug APK over the existing one, then press Start. The application ID and development signing key are unchanged; versionCode is 2. Update the FAP while it is closed. Both 1.1 applications are needed for artwork; either can still negotiate application version 1 with an older peer and use the no-artwork layout.
+
+Album artwork is a 45×45 one-bit image. Title, artist and album stay at the beginning for five seconds before independently scrolling if too wide; they pause 1.5 seconds at the end. The button legend is removed, but all keys and long Back exit work as before. Missing or inaccessible artwork shows a music note. Embedded metadata bitmaps and readable local content URIs are supported; the helper never downloads HTTP artwork.

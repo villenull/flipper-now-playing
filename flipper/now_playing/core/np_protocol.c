@@ -49,7 +49,8 @@ bool np_validate(uint8_t t, const uint8_t *p, size_t n) {
     return n == 12 && np_u16(p + 2) == 768 && np_u16(p + 4) >= 20 &&
            np_u16(p + 4) <= 128 && !np_u16(p + 6) && np_u32(p + 8) == 1 &&
            (t == 1 ? (p[0] >= 1 && p[0] <= p[1])
-                   : ((p[0] == 1 && p[1] == 0) || (p[0] == 0 && p[1] == 1)));
+                   : ((p[0] >= 1 && p[0] <= 2 && p[1] == 0) ||
+                      (p[0] == 0 && p[1] == 1)));
   case 0x10: {
     if (n < 44 || !state(p, n))
       return false;
@@ -72,6 +73,17 @@ bool np_validate(uint8_t t, const uint8_t *p, size_t n) {
     return n == 36 && state(p, n);
   case 0x12:
     return n == 8 && np_u32(p) && np_u32(p + 4);
+  case 0x13:
+    if ((n != 12 && n != 282) || !np_u32(p) || !np_u32(p + 4) || p[11])
+      return false;
+    if (n == 12)
+      return !p[8] && !p[9] && !p[10];
+    if (p[8] != 45 || p[9] != 45 || p[10] != 1)
+      return false;
+    for (size_t i = 17; i < n; i += 6)
+      if (p[i] & 0xe0)
+        return false;
+    return true;
   case 0x20:
     return n == 12 && np_u32(p) && np_u32(p + 4) && p[8] >= 1 && p[8] <= 5 &&
            p[9] <= 1 && (!p[9] || p[8] >= 4) && np_u16(p + 10) >= 1 &&

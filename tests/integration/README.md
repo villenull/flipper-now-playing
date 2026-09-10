@@ -17,3 +17,9 @@ Read-only Android inventory:
 Do not publish raw dumpsys output; it may include unrelated package data. Installation requires explicit device authorization and a selected serial. The installation script never uninstalls an application or clears data. Flipper install uses an explicit mounted SD root or manual qFlipper transfer; never run a flash target.
 
 Device acceptance remains manual for matching numeric pairing codes, unauthenticated-access rejection, GATT confirmation timing, audible local/remote volume, radio teardown and preservation of the original bond. The production helper itself is the real phone-side GATT probe; its status distinguishes SECURING, DISCOVERING, SUBSCRIBING, HANDSHAKING, SYNCING and READY. No mock-transport flag exists in the production APK or FAP.
+
+## Artwork acceptance (1.1)
+- Install both 1.1 builds; confirm title/artist/album and artwork match after next/previous and rapid skips. Test artwork arriving after metadata, missing artwork and player replacement. No old artwork may be attached to a new revision.
+- Use the synthetic test player’s Artwork / no artwork toggle and long album name. Check initial 5-second pause, 12px/sec motion, 1.5-second end pause, fitting rows remaining still, and artwork unaffected by scrolling.
+- Connect either 1.0 peer with a 1.1 peer: READY and controls should still work, with no ARTWORK sent. Reconnect while art is decoding and verify the callback cannot publish into the new session.
+- Android emulator reader tests: `adb -s SERIAL install -r android/app/build/outputs/apk/debug/app-debug.apk`; install `android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk`, then `adb -s SERIAL shell am instrument -w io.github.flippernowplaying.bridge.test/io.github.flippernowplaying.bridge.ArtworkInstrumentation`. This exercises actual bitmap APIs and callback cancellation, not BLE.

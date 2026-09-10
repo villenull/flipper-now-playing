@@ -69,13 +69,14 @@ class CommandRouter {
 class Publisher {
  data class Pending(val type: Int,val payload: ()->ByteArray,val sent: (Long)->Unit={})
  private val control=ArrayDeque<Pending>()
- private var snapshot: Pending?=null; private var state: Pending?=null; private var heartbeat: Pending?=null
- fun clear() { control.clear(); snapshot=null; state=null; heartbeat=null }
+ private var snapshot: Pending?=null; private var state: Pending?=null; private var heartbeat: Pending?=null; private var artwork: Pending?=null
+ fun clear() { control.clear(); snapshot=null; state=null; heartbeat=null; artwork=null }
  fun enqueue(p: Pending): Boolean {
   when(p.type) {
-   16->{snapshot=p;state=null}
+   16->{snapshot=p;state=null;artwork=null}
    17->state=p
    64->heartbeat=p
+   19->artwork=p
    else->{ if(control.size==4) return false; control.addLast(p) }
   }; return true
  }
@@ -84,6 +85,7 @@ class Publisher {
   snapshot?.let { snapshot=null; return it }
   state?.let { state=null; return it }
   heartbeat?.let { heartbeat=null; return it }
+  artwork?.let { artwork=null; return it }
   return null
  }
 }

@@ -6,15 +6,17 @@ def read(name):
  return [[bool(data[y*16+x//8]&(128>>(x%8))) for x in range(128)] for y in range(64)]
 a=read('approved');long=read('long');paused=read('paused');unknown=read('unknown');reconnecting=read('reconnecting');error=read('error');none=read('no-session')
 assert a!=paused and a!=unknown and a!=none and a!=error and a!=reconnecting
-# Scrolling masks restore icon and connection marker and leave gutters untouched.
-for y in range(2,18):
- for x in range(2,18):assert a[y][x]==long[y][x]
-for y in range(0,11):
- for x in range(18,22):assert not long[y][x]
- for x in range(121,124):assert not long[y][x]
+# Artwork is a fixed 45x45 island that scrolling must never overwrite.
+for y in range(1,46):
+ for x in range(1,46):assert a[y][x]==long[y][x]
+for y in range(0,46):
+ for x in range(46,49):assert not long[y][x]
 assert all(a[y][x] for y in range(2,6) for x in range(124,128))
-# Required volume glyphs and independent transport controls.
-assert all(a[42][x] for x in range(62,67)) and all(a[y][64] for y in range(40,45))
-assert all(a[62][x] for x in range(62,67))
-assert sum(a[53][x] for x in range(29,40))>0 and sum(a[53][x] for x in range(89,100))>0
-print('PASS: seven distinct native framebuffers; icon/marquee gutters, connection marker and control geometry')
+start=read('scroll-start');wait=read('scroll-wait');moving=read('scroll-moving')
+assert start[:46]==wait[:46], 'Metadata must remain stationary for first five seconds'
+assert start[:46]!=moving[:46], 'Overflow metadata must scroll after pause'
+assert a!=read('no-artwork'), 'Missing artwork must use visible fallback'
+# Controls were explicitly removed; time/progress is now at the bottom.
+assert not any(a[y][x] for y in range(46,56) for x in range(128))
+assert any(a[58][x] for x in range(32,96))
+print('PASS: artwork gutters preserved, five-second pause/scroll, fallback, time/progress and no control legend')
