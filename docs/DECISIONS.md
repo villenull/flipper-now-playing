@@ -29,3 +29,6 @@ Use exported `storage_sd_status`, not a file stat of `/ext/`: FatFs rejects stat
 
 ## Artwork layout approved by user (1.1)
 45×45 monochrome album art, metadata in three rows to its right, time/progress below. Remove control indicators per explicit user direction; key mappings and long Back remain unchanged. Overflow rows independently pause 5 seconds, move 12px/sec, pause 1.5 seconds and repeat. No-art fallback is a music note. Application-v2 negotiation and fixed 270-byte art preserve legacy connectivity; docs/05_PROTOCOL.md is normative. Android API/package/signing unchanged; versionCode increments to 2. Artwork decoding uses a bounded background worker, current-identity checks and no network permission; URI providers must already grant access.
+
+## Release naming and catalog-style GitHub presentation
+User requested the next public release be **v0.1** and the README resemble the Anki Remote catalog entry. Keep already-tested application build1.1/versionCode2 and its signing identity for in-place upgrades; GitHub tag/release/manifest use v0.1. New icon SVG follows the existing Android vector. Four orange previews come from production128x64 code with unchanged pixel geometry and explicit synthetic-art/simulated labels. No catalog submission is implied.

@@ -1,4 +1,6 @@
-# Now Playing 1.1 — build and validation report
+# Now Playing v0.1 — build and validation report
+
+GitHub release **v0.1** packages application build 1.1 (Android versionCode 2); this keeps upgrade compatibility with the earlier test APK.
 
 Both production apps are updated for 45×45 album artwork and five-second metadata scrolling. Control legends are removed; all physical mappings and long Back exit remain. This is a **preview**, not a completed physical phone/Flipper acceptance release.
 

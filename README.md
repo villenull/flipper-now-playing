@@ -1,12 +1,97 @@
+<img src="docs/media/icon.svg" width="72" height="72" align="left" alt="Now Playing icon">
+
 # Now Playing
 
-A small independent Android media-session helper and an external Flipper Zero app. Dedicated authenticated BLE GATT; no Internet permission, server, Apple credentials, firmware fork, root or changes to Apple Music/the official Flipper app.
+**Your music, on your Flipper.** Album artwork, live track information, and pocket-sized playback controls.
 
-**[Download the Android APK](https://github.com/villenull/flipper-now-playing/releases/download/v1.1.0-preview.1/flipper-now-playing-debug.apk)** · **[Download the Flipper app](https://github.com/villenull/flipper-now-playing/releases/download/v1.1.0-preview.1/now_playing-fw1.4.3-api87.1.fap)**
+**Bluetooth · Media** &nbsp; | &nbsp; **Release v0.1** &nbsp; | &nbsp; **Flipper Zero + Android 8.0+**
 
-Open the APK link on an Android 8.0+ phone, download it, then tap it to install. This preview is built and software-tested; physical BLE/Apple Music acceptance remains unverified. See the release notes before use.
+### Download & install
 
-Built artifacts and evidence live in `dist/` after running the build scripts. Start with [installation and pairing](docs/INSTALL.md), [build results](docs/BUILD_REPORT.md) and [hardware validation](docs/HARDWARE_VALIDATION.md). Physical radio, Apple Music and locked-screen acceptance is distinct from successful host tests/builds.
+**[⬇ Download the Android APK](https://github.com/villenull/flipper-now-playing/releases/download/v0.1/flipper-now-playing-debug.apk)** — open this link on your phone, download, and tap to install.
+
+**[⬇ Download the Flipper app (.fap)](https://github.com/villenull/flipper-now-playing/releases/download/v0.1/now_playing-fw1.4.3-api87.1.fap)** · [All release files](https://github.com/villenull/flipper-now-playing/releases/tag/v0.1) · [Detailed installation guide](docs/INSTALL.md)
+
+> **Preview release.** Built for official Flipper firmware **1.4.3 / API 87.1**. Hardware acceptance is still in progress. Update both the APK and FAP for artwork. The APK can update the previous helper in place.
+
+## Screen previews
+
+| Now playing | Long names scrolling |
+|:---:|:---:|
+| ![Album artwork beside song, artist and album; time and progress below](docs/media/playing.png) | ![Long song and album names scrolling in their own rows](docs/media/scrolling.png) |
+| Paused | Artwork unavailable |
+| ![Paused playback with retained artwork and progress](docs/media/paused.png) | ![Music-note fallback when the player provides no readable cover](docs/media/no-artwork.png) |
+
+Generated from the **production 128×64 renderer**, enlarged 3× with an orange LCD palette. The cover is an original synthetic test image. These are simulated screens, not device photographs. [Native-resolution example](docs/media/playing-native.png).
+
+## What does Now Playing do?
+
+Now Playing turns your Flipper Zero into a small display and remote for music on your Android phone. A companion Android helper reads the selected player's media session and sends updates over a dedicated Bluetooth connection.
+
+- **Album artwork** in a 45×45 monochrome cover.
+- **Song, artist, and album** alongside the artwork.
+- **Live progress**, with elapsed/total or remaining time.
+- **Playback and volume controls** through the Flipper's physical buttons.
+- **Apple Music by default**, with another observed player or Auto selectable in the helper.
+
+Apple Music and the official Flipper Android app stay unchanged. This is a separate APK and external FAP; it does not require a firmware fork.
+
+## How to use
+
+1. **Install the Android helper.** Download the APK above on your phone and tap it. If Android prompts, allow installation from your browser. To update, stop the helper first and install over the existing version.
+2. **Copy the Flipper app.** With Now Playing closed, use qFlipper to copy the FAP to `SD Card/apps/Bluetooth/now_playing.fap`. No firmware flashing is involved.
+3. **Open Now Playing on the Flipper.** Go to **Apps → Bluetooth → Now Playing**. Disconnect any active management connection in the official Flipper Android app.
+4. **Connect from the helper.** Grant Bluetooth and notification access, tap **Find Now Playing devices**, select your device, and tap **Start**. Confirm the matching pairing code on both devices.
+5. **Play a song.** Start playback in Apple Music. Track information will appear once the connection is ready.
+
+The helper's ongoing notification includes **Stop**. After a reboot or force-stop, open the helper and press Start again. For Android's sideloaded-app settings and troubleshooting, see the [installation guide](docs/INSTALL.md).
+
+## Controls
+
+The screen leaves room for your music; there is no button legend.
+
+| Flipper button | Action |
+|---|---|
+| Up / Down | Volume up / down; hold to repeat |
+| Left / Right | Previous / next track |
+| OK | Play / pause |
+| Hold Back | Exit and restore the default Bluetooth profile |
+
+## Artwork & scrolling
+
+Artwork is resized and dithered on the phone. If the player does not supply an accessible image, a music note appears instead. The helper reads embedded media artwork or a readable local content URI; it does not download covers from the web.
+
+Each long song, artist, or album name **pauses at the beginning for five seconds**, scrolls to reveal the rest, pauses briefly at the end, and repeats. Names that fit stay still. Display text is normalized to printable ASCII; the phone preview retains the original text.
+
+## Privacy & requirements
+
+- Android **8.0 / API 26 or newer**; Bluetooth and user-enabled notification access.
+- Flipper Zero with an SD card and **official firmware 1.4.3 / API 87.1**.
+- No Internet permission, backend, Apple credentials, root, analytics, or listening-history database.
+- Notification access is used for media-session access; unrelated notification content is not collected.
+- The app uses its own Bluetooth identity and bond storage.
+
+The connected **Momentum mntm-012 / API 87.1** device accepted the FAP and was reopened after installation. This is not a claim of full Momentum or newer-firmware compatibility. See [compatibility](docs/COMPATIBILITY.md).
+
+## Validation status
+
+The local build passes **30 reference tests**, **17 Kotlin/Android unit tests**, **C ASan/UBSan**, **722 valid + 731 malformed cross-language cases**, Android lint, eleven native screen checks, and five actual artwork-reader tests on an Android emulator. USB installation on the connected Flipper was verified by reading the file back.
+
+**Still awaiting physical acceptance:** phone-to-Flipper artwork, pairing and rapid track changes, background/Android 17 volume, bond preservation, and endurance. [Build report](docs/BUILD_REPORT.md) · [Hardware checklist](docs/HARDWARE_VALIDATION.md) · [Checksums](https://github.com/villenull/flipper-now-playing/releases/download/v0.1/SHA256SUMS)
+
+## Changelog
+
+### v0.1
+
+- Add 45×45 album artwork with a missing-cover fallback.
+- Put track details to the right and time/progress below.
+- Pause long names for five seconds before scrolling.
+- Remove on-screen button indicators; keep every physical control.
+- Add negotiated artwork support while allowing older peers to connect without it.
+- Fix the SD-card startup check that prevented the first preview from opening.
+- Add artwork conversion, stale-data, native-render and Android device-level tests.
+
+## Build from source
 
 ```sh
 ./scripts/bootstrap.sh --accept-android-sdk-license
@@ -15,8 +100,14 @@ Built artifacts and evidence live in `dist/` after running the build scripts. St
 python3 scripts/package_release.py
 ```
 
-Review the Android SDK license before passing the explicit acceptance flag. Toolchains are pinned in `.toolchains.lock.json` and installed only under `.cache/`. Builds/tests never install onto a device or flash firmware. Runtime source is under `android/` and `flipper/now_playing/`; the supplied normative handoff remains in `docs/01_…` through `docs/10_…`.
+Read the Android SDK license before supplying its acceptance flag. Toolchains are pinned in [`.toolchains.lock.json`](.toolchains.lock.json) and installed under `.cache/`. Builds never flash firmware or install onto a device. Exact versions and results are in the [build report](docs/BUILD_REPORT.md).
 
-On Flipper: Up/Down volume; Left/Right previous/next; OK play/pause; **hold Back to exit**. The 128×64 view includes a 45×45 monochrome album cover, title/artist/album scrolling after a five-second pause, progress and elapsed/total or remaining time. Button indicators are omitted; physical controls remain unchanged. App-specific bonds remain separate; default profile and key path are restored before unload.
+## Credits & references
 
-Artwork requires the **1.1 APK and FAP**. Older versions can still connect without artwork. When the selected player does not expose a readable cover, a music-note placeholder appears. Install the updated APK over the existing helper, then press Start again; no uninstall or bond reset is required.
+- [Official Flipper firmware](https://github.com/flipperdevices/flipperzero-firmware): exported API, BLE infrastructure, Canvas and native fonts.
+- [Android media-session APIs](https://developer.android.com/reference/android/media/session/MediaSession): selected-player metadata and controls.
+- [Anki Remote's catalog page](https://lab.flipper.net/apps/anki_remote): inspiration for this listing's organization.
+
+The app icon follows the helper's existing music-note design. Screen previews are generated from this repository's renderer; no proprietary album cover is bundled in the applications.
+
+[GPL-3.0 license](LICENSE) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Report an issue](https://github.com/villenull/flipper-now-playing/issues)
