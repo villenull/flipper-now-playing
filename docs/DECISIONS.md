@@ -32,3 +32,5 @@ Use exported `storage_sd_status`, not a file stat of `/ext/`: FatFs rejects stat
 
 ## Release naming and catalog-style GitHub presentation
 User requested the next public release be **v0.1** and the README resemble the Anki Remote catalog entry. Keep already-tested application build1.1/versionCode2 and its signing identity for in-place upgrades; GitHub tag/release/manifest use v0.1. New icon SVG follows the existing Android vector. Four orange previews come from production128x64 code with unchanged pixel geometry and explicit synthetic-art/simulated labels. No catalog submission is implied.
+
+- README presentation: user prefers one orange version of the approved concept render over the four-state gallery. Label it as a concept and retain a native 128×64 production-renderer link for accurate device-resolution evidence.

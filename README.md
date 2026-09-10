@@ -14,15 +14,11 @@
 
 > **Preview release.** Built for official Flipper firmware **1.4.3 / API 87.1**. Hardware acceptance is still in progress. Update both the APK and FAP for artwork. The APK can update the previous helper in place.
 
-## Screen previews
+## Screen preview
 
-| Now playing | Long names scrolling |
-|:---:|:---:|
-| ![Album artwork beside song, artist and album; time and progress below](docs/media/playing.png) | ![Long song and album names scrolling in their own rows](docs/media/scrolling.png) |
-| Paused | Artwork unavailable |
-| ![Paused playback with retained artwork and progress](docs/media/paused.png) | ![Music-note fallback when the player provides no readable cover](docs/media/no-artwork.png) |
+![Now Playing orange concept render with album artwork on the left and track details on the right](docs/media/now-playing-concept-orange.png)
 
-Generated from the **production 128×64 renderer**, enlarged 3× with an orange LCD palette. The cover is an original synthetic test image. These are simulated screens, not device photographs. [Native-resolution example](docs/media/playing-native.png).
+Concept render of the approved layout. The actual 128×64 display is coarser; see the [native production-renderer example](docs/media/playing-native.png).
 
 ## What does Now Playing do?
 
@@ -108,6 +104,6 @@ Read the Android SDK license before supplying its acceptance flag. Toolchains ar
 - [Android media-session APIs](https://developer.android.com/reference/android/media/session/MediaSession): selected-player metadata and controls.
 - [Anki Remote's catalog page](https://lab.flipper.net/apps/anki_remote): inspiration for this listing's organization.
 
-The app icon follows the helper's existing music-note design. Screen previews are generated from this repository's renderer; no proprietary album cover is bundled in the applications.
+The app icon follows the helper's existing music-note design. The orange concept render was generated from the approved design; the linked native example comes from this repository's production renderer. No proprietary album cover is bundled in the applications.
 
 [GPL-3.0 license](LICENSE) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Report an issue](https://github.com/villenull/flipper-now-playing/issues)
