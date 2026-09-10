@@ -1,0 +1,7 @@
+App(
+ appid="now_playing", name="Now Playing", apptype=FlipperAppType.EXTERNAL,
+ entry_point="now_playing_app", requires=["bt", "gui", "storage"],
+ stack_size=4096, fap_version=(1,0), fap_category="Bluetooth",
+ fap_icon="assets/app.png",
+ fap_author="Now Playing contributors", fap_description="Local Android media display and controls",
+)

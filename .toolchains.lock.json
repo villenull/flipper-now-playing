@@ -1,0 +1,50 @@
+{
+  "flipper": {
+    "tag": "1.4.3",
+    "commit": "8622f1a2b83d8f4918dd5fa3f43de963f6d6f819",
+    "api": "87.1",
+    "api_symbols_sha256": "da9f564c06e20cdaa28070d2f9a2a3753774ba0f78b0a72bf4cbae726e5f8f77",
+    "toolchain": "gcc-arm-none-eabi 12.3.1 / Flipper 39"
+  },
+  "android": {
+    "compileSdk": 36,
+    "targetSdk": 36,
+    "minSdk": 26,
+    "agp": "8.10.1",
+    "gradle": "8.11.1",
+    "kotlin": "2.1.20",
+    "buildTools": "35.0.0",
+    "jdk": "Temurin 17.0.16+8",
+    "platformRevision": 2,
+    "gradle_sha256": "f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6",
+    "jdk_sha256": "166774efcf0f722f2ee18eba0039de2d685b350ee14d7b69e6f83437dafd2af1",
+    "platformTools": "37.0.1"
+  },
+  "host": {
+    "python": "3.14.7",
+    "gcc": "16.2.1",
+    "clang": "22.1.8"
+  },
+  "downloads": {
+    "jdk.tar.gz": {
+      "url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.16%2B8/OpenJDK17U-jdk_x64_linux_hotspot_17.0.16_8.tar.gz",
+      "sha256": "166774efcf0f722f2ee18eba0039de2d685b350ee14d7b69e6f83437dafd2af1"
+    },
+    "gradle.zip": {
+      "url": "https://services.gradle.org/distributions/gradle-8.11.1-bin.zip",
+      "sha256": "f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6"
+    },
+    "platform.zip": {
+      "url": "https://dl.google.com/android/repository/platform-36_r02.zip",
+      "sha256": "37607369a28c5b640b3a7998868d45898ebcb777565a0e85f9acf36f29631d2e"
+    },
+    "build-tools.zip": {
+      "url": "https://dl.google.com/android/repository/build-tools_r35_linux.zip",
+      "sha256": "bd3a4966912eb8b30ed0d00b0cda6b6543b949d5ffe00bea54c04c81e1561d88"
+    },
+    "platform-tools.zip": {
+      "url": "https://dl.google.com/android/repository/platform-tools_r37.0.1-linux.zip",
+      "sha256": "d230f13842f60f782a8645f9c813f8f845bf36089ea7289f28c48f17979313f1"
+    }
+  }
+}

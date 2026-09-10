@@ -1,0 +1,30 @@
+{
+  "package": "Flipper Now Playing \u2014 autonomous development handoff",
+  "handoff_version": "1.0",
+  "prepared_date": "2026-09-09",
+  "protocol_version": "FNP/1",
+  "artifact_kind": "implementation_plan_and_reference_fixtures",
+  "production_apk_built": false,
+  "production_fap_built": false,
+  "physical_device_tests_run": false,
+  "reference_unit_tests_passed": 27,
+  "golden_vector_count": 16,
+  "product_acceptance_criteria": 74,
+  "primary_source_groups": 27,
+  "firmware_baseline": {
+    "official_tag": "1.4.3",
+    "exported_api": "87.1",
+    "full_commit": "resolve_and_lock_during_implementation"
+  },
+  "android_baseline": {
+    "min_sdk": 26,
+    "compile_sdk": 36,
+    "target_sdk": 36,
+    "additional_compatibility_test_api": 37
+  },
+  "standalone_master": {
+    "filename": "FLIPPER_NOW_PLAYING_MASTER_SPEC.md",
+    "sha256": "e619bee68898b83a84a8606d13d3372ab991a74ad00105927cbfb8bc93a41058"
+  },
+  "integrity_file": "SHA256SUMS"
+}

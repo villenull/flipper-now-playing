@@ -1,0 +1,25 @@
+name: Build and verify
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  software:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Bootstrap pinned local tools
+        run: ./scripts/bootstrap.sh --accept-android-sdk-license
+      - run: ./scripts/doctor.sh
+      - run: ./scripts/test_all.sh
+      - run: python3 scripts/package_release.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: software-evidence
+          path: |
+            dist/
+            build/evidence/
+            build/screenshots/
+            android/**/build/reports/
+# No device/flash/install job. Hardware acceptance requires an authorized lab.

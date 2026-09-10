@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.16)
+project(np_host C)
+set(CMAKE_C_STANDARD 11)
+set(CORE ../now_playing/core)
+add_library(np_core ${CORE}/np_protocol.c ${CORE}/np_model.c)
+target_include_directories(np_core PUBLIC ${CORE})
+target_compile_options(np_core PRIVATE -Wall -Wextra -Werror)
+add_executable(test_core test_core.c)
+target_link_libraries(test_core np_core)
+add_executable(c_codec codec_cli.c)
+target_link_libraries(c_codec np_core)
+# scripts/test_host.py is the dependency-free canonical test entry and supplies fixtures.

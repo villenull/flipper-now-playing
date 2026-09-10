@@ -1,0 +1,25 @@
+# Engineering decisions
+
+- Preserve FNP/1 exactly as specified. No discrepancy identified in the reference syntax during initial read.
+- Official firmware baseline: 1.4.3, commit 8622f1a2b83d8f4918dd5fa3f43de963f6d6f819, API to be independently audited.
+- Fetch dependencies only into project-local `.cache`; do not alter global SDKs, accept SDK licenses silently, or install on devices.
+- Use a serial Android Handler actor and platform Views/APIs to keep runtime dependencies small. Pure Kotlin domain code remains independent of Android bindings.
+- Android toolchain: AGP 8.10.1, Gradle 8.11.1, Kotlin 2.1.20, Temurin 17.0.16+8, SDK 36 r2 and build tools 35.0.0. AGP compatibility verified with https://developer.android.com/build/releases/agp-8-10-0-release-notes . Exact archives and checksums recorded in the lock/bootstrap.
+- Keep GATT writes at 20 bytes in v1. MTU negotiation is optional in the contract; omitting it removes a setup failure path while preserving interoperability at minimum MTU. Measure worst-case metadata throughput on hardware.
+- Diagnostics export uses the system document picker (ACTION_CREATE_DOCUMENT), writing only a user-selected URI. This avoids a provider and broad storage permission while retaining explicit redacted export.
+- Import audit uses the packaged FAP, not the intermediate debug ELF: fbt removes linker-only `uxTopUsedPriority` from the final file. All 54 initial packaged imports are exported.
+- ASan/UBSan work with `ASAN_OPTIONS=detect_leaks=0`. LSan aborts because this managed environment uses ptrace; report leak sanitizer NOT_RUN rather than treating its runtime limitation as a passing leak test.
+- Renderer uses native FontPrimary (`u8g2_font_helvB08_tr`, height 8/descender 2) and FontSecondary (`u8g2_font_haxrcorp4089_tr`, height 7/descender 2). Baselines 8/18/27/36 match the handoff. Masks erase only each row's outside columns; note/status decorations are restored afterward. Host adapter links the exact pinned rasterizer/font data; no environment font is bundled.
+- The production input owner ticks every 25 ms so the 400/125-ms repeat schedule is representable. View invalidation is at most 10 Hz for animation/held keys and about 1 Hz for ordinary progress; paused short static metadata is not continuously redrawn.
+- The Flipper startup checks writable app-data storage with a disposable `.write-probe` before changing key paths. This file is the only temporary storage item the app removes. Bond data is never deleted by runtime repair.
+- BLE callback fencing uses an active-callback counter and a short exported Furi scheduler lock around dispatcher unregistration. Dispatcher callbacks originate in BleEventWorker, not interrupts. The application joins its TX worker before profile restoration; waits/radio operations remain outside the scheduler lock. This is a source-level ownership argument, still requiring physical teardown tests.
+- Host codec CLIs use line-delimited frame hex to avoid adding JSON parsing code to C/Kotlin production dependencies. The Python interoperability driver generates seeded valid models and malformed cases and invokes both independent production codecs. Direct production payload/model tests supplement opaque frame roundtrips.
+- Headless physical probe is the actual Android helper and its explicit state display/diagnostic export, with the separate controllable MediaSession fixture. No fake transport is linked into either production application.
+- Runtime counters never wrap: Android sequence exhaustion closes/reconnects; Flipper message exhaustion resets transport. Duplicate commands reserve a result before dispatch, retain at most 32 outcomes/30 seconds, and reject old IDs outside the cache. The transport independently tracks older IDs across non-command frames.
+- Default-profile restoration retries while retaining executable resources and an error screen. No automatic reset or firmware flash is used. Source verification does not establish that the radio/profile cleanup passes on a physical device.
+
+## Final disconnect readiness fence
+Keep STOPPING and reset/disconnect flags asserted until the transport worker joins. Recheck stopping under the model lock before applying incoming state, guard snapshot readiness, invalidate readiness again after join, and reject controls while STOPPING. This closes the reviewed late-snapshot race without replaying commands. Physical callback timing remains in the hardware acceptance gate.
+
+## User-selected product name and GitHub distribution
+The user corrected earlier typos and selected **Now Playing**, and requested a new GitHub repository for easy APK installation. Publish as `villenull/flipper-now-playing`, with matching app display names. Preserve application IDs, BLE UUIDs, NP pairing identity, bond paths, artifact filenames and signing identity to maintain compatibility. First distribution is a clearly labeled hardware-unverified preview. Normative handoff documents retain their original project name.

@@ -1,0 +1,11 @@
+Implement the complete Flipper Now Playing project in this repository using the included handoff package.
+
+Begin by reading AGENTS.md, START_HERE.md, all ten numbered documents in docs/, the approved concept image, and the protocol constants, reference codec, and golden vectors. Then execute the full development plan without waiting for me to approve individual milestones. I want working applications, tests, build artifacts, installation instructions, and an honest validation report—not another proposal or a starter scaffold.
+
+The required product is a new small Android helper APK plus a new external Flipper Zero .fap. Apple Music and the official Flipper Android application must remain unchanged. No custom firmware, root, backend, Apple credentials, or privileged permission workaround. Show song, artist, album, playback progress, elapsed/total or remaining time, and the approved control layout on the real 128×64 Flipper display. Keep Up/Down volume, Left/Right previous/next, OK play/pause, and hold Back to exit.
+
+First resolve the highest-risk integration: compile a custom-GATT external FAP against the pinned official firmware's exported API, and implement the Android pairing/handshake path. Use a dedicated BLE service, not the stock serial/RPC service. Follow the documented profile cleanup, bond isolation, Android foreground-service lifecycle, and duplicate-command protections. Do not substitute a mock transport for the final production transport.
+
+Make reasonable defaults and record decisions instead of asking me non-blocking questions. Do not modify unrelated files or perform destructive device operations. Use real available toolchains, run the tests, fix the failures, and build the APK and FAP. When hardware is available and authorized, execute the hardware acceptance checklist. When hardware or a toolchain is unavailable, finish every independent part of the implementation and clearly state the exact checks or artifacts that remain unverified; do not claim they passed.
+
+Keep an execution log so you can continue after context compaction. At completion, give me the artifact paths, exact versions and commands used, test results, pairing/install steps, and any remaining device-specific limitations. Continue until the specified software is complete or you can identify a concrete external blocker for the remaining work.

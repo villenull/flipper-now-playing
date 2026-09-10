@@ -1,0 +1,20 @@
+<resources>
+ <string name="ui_1">Now Playing</string>
+ <string name="ui_2">Local media display and controls. Enable notification access to read the selected media session. No notification collection, account, Internet permission, or listening history. Start keeps a visible connection service running; reopen and Start after reboot or force-stop.</string>
+ <string name="ui_3">If Android restricts this setting for a sideloaded app, review the app\'s system App info and its user-controlled Allow restricted settings option. Notification access is separate from ordinary notification visibility.</string>
+ <string name="ui_4">Elapsed / remaining time</string>
+ <string name="ui_5">Grant Bluetooth access first</string>
+ <string name="ui_6">Enable notification access first</string>
+ <string name="ui_7">Select the device advertising Now Playing first</string>
+ <string name="ui_8">Grant Bluetooth permissions first</string>
+ <string name="ui_9">Enable Bluetooth and launch Now Playing on the Flipper</string>
+ <string name="ui_10">Scanning for the dedicated Now Playing service…</string>
+ <string name="ui_11">Bluetooth permission was revoked</string>
+ <string name="ui_12">Bluetooth permission was revoked</string>
+ <string name="ui_13">Diagnostic export failed</string>
+ <string name="selected_pair">Selected custom-profile device · %1$s. Tap Start, then confirm the matching system pairing code.</string>
+ <string name="scan_error">Scan failed (%1$d). Check Bluetooth and retry.</string>
+ <string name="status">Bluetooth permission: %1$s\nNotification access: %2$s\nService: %3$s\nPlayer: %4$s\n%5$s</string>
+ <string name="device">Selected device: %1$s</string>
+ <string name="none">none</string>
+</resources>

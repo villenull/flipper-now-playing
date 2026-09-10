@@ -1,0 +1,90 @@
+{
+  "protocol": "FNP/1",
+  "version": 1,
+  "magic_hex": "464e5031",
+  "service_uuid": "8f9a1000-6d8a-4f1b-a6e6-3b4c5d6e7f80",
+  "phone_to_flipper_uuid": "8f9a1001-6d8a-4f1b-a6e6-3b4c5d6e7f80",
+  "flipper_to_phone_uuid": "8f9a1002-6d8a-4f1b-a6e6-3b4c5d6e7f80",
+  "cccd_uuid": "00002902-0000-1000-8000-00805f9b34fb",
+  "cccd_indications_hex": "0200",
+  "header_bytes": 16,
+  "crc_bytes": 4,
+  "max_payload_bytes": 768,
+  "max_frame_bytes": 788,
+  "characteristic_max_bytes": 128,
+  "flipper_tx_chunk_bytes": 20,
+  "max_media_ms": 315360000000,
+  "crc": {
+    "name": "CRC-32/ISO-HDLC",
+    "reflected_polynomial_hex": "edb88320",
+    "init_hex": "ffffffff",
+    "xorout_hex": "ffffffff",
+    "refin": true,
+    "refout": true,
+    "check_123456789_hex": "cbf43926",
+    "wire_order": "little-endian",
+    "coverage": "frame[4:16+payload_length]"
+  },
+  "message_types": {
+    "HELLO": 1,
+    "HELLO_ACK": 2,
+    "SNAPSHOT": 16,
+    "STATE": 17,
+    "SNAPSHOT_APPLIED": 18,
+    "COMMAND": 32,
+    "COMMAND_RESULT": 33,
+    "REQUEST_SNAPSHOT": 48,
+    "PING": 64,
+    "PONG": 65,
+    "ERROR": 126,
+    "BYE": 127
+  },
+  "commands": {
+    "PLAY_PAUSE": 1,
+    "PREVIOUS": 2,
+    "NEXT": 3,
+    "VOLUME_UP": 4,
+    "VOLUME_DOWN": 5
+  },
+  "playback_states": {
+    "NO_SESSION": 0,
+    "STOPPED": 1,
+    "PAUSED": 2,
+    "PLAYING": 3,
+    "BUFFERING": 4,
+    "ERROR": 5,
+    "UNKNOWN": 6
+  },
+  "command_statuses": {
+    "DISPATCHED": 0,
+    "NO_PLAYER": 1,
+    "STALE_EPOCH": 2,
+    "UNSUPPORTED": 3,
+    "EXPIRED": 4,
+    "PERMISSION_DENIED": 5,
+    "INTERNAL_ERROR": 6,
+    "NOT_READY": 7
+  },
+  "field_max_bytes": {
+    "title": 192,
+    "artist": 128,
+    "album": 192,
+    "app": 48
+  },
+  "timing_ms": {
+    "periodic_state": 10000,
+    "heartbeat": 15000,
+    "peer_stale": 35000,
+    "incomplete_frame_idle": 5000,
+    "incomplete_frame_total": 15000,
+    "command_tap_ttl": 750,
+    "command_repeat_ttl": 300,
+    "volume_hold_delay": 400,
+    "volume_repeat_period": 125,
+    "command_result_timeout": 2000
+  },
+  "layout": {
+    "width": 128,
+    "height": 64
+  }
+}

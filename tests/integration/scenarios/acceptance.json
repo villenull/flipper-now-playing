@@ -1,0 +1,11 @@
+{
+ "protocol": "FNP/1",
+ "required_scenarios": [
+  {"name":"already-playing", "steps":["Start Apple Music and play", "Start helper from visible activity", "Launch FAP and pair", "Verify all metadata and time"]},
+  {"name":"minimum-mtu", "steps":["Use production fixed 20-byte writes", "Publish maximum fixture metadata", "Verify atomic display and snapshot ACK"]},
+  {"name":"hold-disconnect", "steps":["Hold volume", "Disconnect phone", "Release key", "Reconnect", "Verify no queued volume burst"]},
+  {"name":"restore", "repeat":30, "steps":["Launch FAP", "Connect custom profile", "Hold Back during pending traffic", "Verify stock official-app bond remains usable"]},
+  {"name":"screen-off", "duration_minutes":120, "steps":["Connect headphones", "Start helper visibly", "Lock phone", "Exercise every control", "Record service and volume behavior"]},
+  {"name":"api37", "steps":["Use Android 17 test phone", "Enable documented background-audio diagnostic only with authorization", "Test locked-screen volume", "Restore prior diagnostic setting"]}
+ ]
+}
