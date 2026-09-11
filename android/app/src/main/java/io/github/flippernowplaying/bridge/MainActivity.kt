@@ -171,7 +171,7 @@ class MainActivity: Activity() {
      text="${result.scanRecord?.deviceName?:"Now Playing"} · ${address.takeLast(5)}"
      setOnClickListener {
       prefs.edit().putString("device",address).apply()
-      hint.text=getString(R.string.selected_pair,address.takeLast(5))
+      this@MainActivity.hint.text=getString(R.string.selected_pair,address.takeLast(5))
       // Selecting IS connecting: no second Start tap.
       startBridge()
      }
