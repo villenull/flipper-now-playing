@@ -4,13 +4,13 @@
 
 **Your music, on your Flipper.** Album artwork, live track information, and pocket-sized playback controls.
 
-**Bluetooth · Media** &nbsp; | &nbsp; **Release v0.1** &nbsp; | &nbsp; **Flipper Zero + Android 8.0+**
+**Bluetooth · Media** &nbsp; | &nbsp; **Release v0.2** &nbsp; | &nbsp; **Flipper Zero + Android 8.0+**
 
 ### Download & install
 
-**[⬇ Download the Android APK](https://github.com/villenull/flipper-now-playing/releases/download/v0.1/flipper-now-playing-debug.apk)** — open this link on your phone, download, and tap to install.
+**[⬇ Download the Android APK](https://github.com/villenull/flipper-now-playing/releases/download/v0.2/flipper-now-playing-debug.apk)** — open this link on your phone, download, and tap to install.
 
-**[⬇ Download the Flipper app (.fap)](https://github.com/villenull/flipper-now-playing/releases/download/v0.1/now_playing-fw1.4.3-api87.1.fap)** · [All release files](https://github.com/villenull/flipper-now-playing/releases/tag/v0.1) · [Detailed installation guide](docs/INSTALL.md)
+**[⬇ Download the Flipper app (.fap)](https://github.com/villenull/flipper-now-playing/releases/download/v0.2/now_playing-fw1.4.3-api87.1.fap)** · [All release files](https://github.com/villenull/flipper-now-playing/releases/tag/v0.2) · [Detailed installation guide](docs/INSTALL.md)
 
 > **Preview release.** Built for official Flipper firmware **1.4.3 / API 87.1**. Hardware acceptance is still in progress. Update both the APK and FAP for artwork. The APK can update the previous helper in place.
 
@@ -73,9 +73,14 @@ The connected **Momentum mntm-012 / API 87.1** device accepted the FAP and was r
 
 The local build passes **30 reference tests**, **17 Kotlin/Android unit tests**, **C ASan/UBSan**, **722 valid + 731 malformed cross-language cases**, Android lint, eleven native screen checks, and five actual artwork-reader tests on an Android emulator. USB installation on the connected Flipper was verified by reading the file back.
 
-**Still awaiting physical acceptance:** phone-to-Flipper artwork, pairing and rapid track changes, background/Android 17 volume, bond preservation, and endurance. [Build report](docs/BUILD_REPORT.md) · [Hardware checklist](docs/HARDWARE_VALIDATION.md) · [Checksums](https://github.com/villenull/flipper-now-playing/releases/download/v0.1/SHA256SUMS)
+**Still awaiting physical acceptance:** phone-to-Flipper artwork, pairing and rapid track changes, background/Android 17 volume, bond preservation, and endurance. [Build report](docs/BUILD_REPORT.md) · [Hardware checklist](docs/HARDWARE_VALIDATION.md) · [Checksums](https://github.com/villenull/flipper-now-playing/releases/download/v0.2/SHA256SUMS)
 
 ## Changelog
+
+### v0.2
+
+- One-click setup: a single Connect button walks Bluetooth permission, media access, and Flipper selection in order; tapping the found Flipper starts immediately.
+- Player choice, elapsed/remaining, diagnostics, and change/forget move to collapsed Advanced. Same package and signing certificate; updates v0.1 in place.
 
 ### v0.1
 
