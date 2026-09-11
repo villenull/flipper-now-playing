@@ -20,9 +20,6 @@
  <string name="hint_running_status">%1$s %2$s</string>
  <string name="row_ok">✓</string>
  <string name="row_missing">○</string>
- <string name="check_bt">Bluetooth</string>
- <string name="check_media">Media access</string>
- <string name="check_flipper">Flipper</string>
  <string name="scanning">Looking for Now Playing on your Flipper… select it below. Scan stops automatically.</string>
  <string name="scan_error">Scan failed (%1$d). Check Bluetooth and tap Connect to retry.</string>
  <string name="selected_pair">Flipper selected · %1$s. Starting… confirm the matching pairing code on both devices if asked.</string>
