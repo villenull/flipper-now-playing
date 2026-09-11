@@ -1,8 +1,34 @@
 <resources>
  <string name="ui_1">Now Playing</string>
- <string name="ui_2">Local media display and controls. Enable notification access to read the selected media session. No notification collection, account, Internet permission, or listening history. Start keeps a visible connection service running; reopen and Start after reboot or force-stop.</string>
- <string name="ui_3">If Android restricts this setting for a sideloaded app, review the app\'s system App info and its user-controlled Allow restricted settings option. Notification access is separate from ordinary notification visibility.</string>
+ <string name="ui_2">One tap connects your Flipper as a Now Playing display for Apple Music. No account, no Internet, no listening history. Keep the helper running while you listen; reopen and tap Connect after reboot or force-stop.</string>
+ <string name="ui_3">Sideloaded apps may need the system App info → Allow restricted settings option before media access can be enabled. Media access is separate from ordinary notification visibility.</string>
  <string name="ui_4">Elapsed / remaining time</string>
+ <string name="hint_bt">Tap Connect to grant Bluetooth access.</string>
+ <string name="hint_media">Tap Connect to enable media access, then return here — connection continues automatically.</string>
+ <string name="hint_scan">Tap Connect to find your Flipper. Launch Apps → Bluetooth → Now Playing on the Flipper first.</string>
+ <string name="hint_ready">Tap Connect to start. Then play a track in Apple Music.</string>
+ <string name="hint_running">Connected helper is running. Open the Now Playing app on your Flipper.</string>
+ <string name="btn_connect">Connect</string>
+ <string name="btn_stop">Stop</string>
+ <string name="btn_advanced">Advanced</string>
+ <string name="btn_change">Change Flipper</string>
+ <string name="btn_forget">Forget Flipper</string>
+ <string name="btn_player">Player: %1$s</string>
+ <string name="btn_export">Export redacted diagnostics</string>
+ <string name="row_ok">✓</string>
+ <string name="row_missing">○</string>
+ <string name="check_bt">Bluetooth</string>
+ <string name="check_media">Media access</string>
+ <string name="check_flipper">Flipper</string>
+ <string name="scanning">Looking for Now Playing on your Flipper… select it below. Scan stops automatically.</string>
+ <string name="scan_error">Scan failed (%1$d). Check Bluetooth and tap Connect to retry.</string>
+ <string name="no_device_hint">No Flipper selected yet.</string>
+ <string name="selected_pair">Flipper selected · %1$s. Starting… confirm the matching pairing code on both devices if asked.</string>
+ <string name="status_line">%1$s</string>
+ <string name="device_line">Flipper: %1$s</string>
+ <string name="track_hint">Open Apple Music and play a track — it appears here and on your Flipper.</string>
+ <string name="none">none</string>
+ <!-- legacy keys kept for compat -->
  <string name="ui_5">Grant Bluetooth access first</string>
  <string name="ui_6">Enable notification access first</string>
  <string name="ui_7">Select the device advertising Now Playing first</string>
@@ -12,9 +38,6 @@
  <string name="ui_11">Bluetooth permission was revoked</string>
  <string name="ui_12">Bluetooth permission was revoked</string>
  <string name="ui_13">Diagnostic export failed</string>
- <string name="selected_pair">Selected custom-profile device · %1$s. Tap Start, then confirm the matching system pairing code.</string>
- <string name="scan_error">Scan failed (%1$d). Check Bluetooth and retry.</string>
  <string name="status">Bluetooth permission: %1$s\nNotification access: %2$s\nService: %3$s\nPlayer: %4$s\n%5$s</string>
  <string name="device">Selected device: %1$s</string>
- <string name="none">none</string>
 </resources>

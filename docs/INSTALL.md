@@ -12,8 +12,8 @@ Use `now_playing-fw1.4.3-api87.1.fap` with official Flipper firmware 1.4.3/expor
 2. Use qFlipper's file browser to copy the versioned FAP to the Flipper SD card as `apps/Bluetooth/now_playing.fap`. Alternatively, with the SD card explicitly mounted, run `./scripts/install_flipper.sh --sd-root /path/to/that/card`.
 3. Disconnect the official Flipper Android app's active management connection. Leave that app and Apple Music installed and unchanged.
 4. On Flipper, open Apps → Bluetooth → Now Playing. The new app uses a dedicated NP Bluetooth identity and app-specific bond file.
-5. Open the helper. Grant Bluetooth access and enable notification **access** in system settings. Android 13+ notification posting permission is a separate optional grant for normal notification visibility. Restricted settings on sideloaded applications are controlled through Android's own App info/settings UI.
-6. Tap Find Now Playing devices, choose the device advertising the custom service, then tap Start. Confirm the matching system pairing code on both devices. Wait for READY, then play in Apple Music. Apple Music-only is the default; Auto or an explicitly observed player can be selected in setup.
+5. Open the helper and tap Connect. It walks the three steps in order: Bluetooth access, then media (notification-listener) access in system settings, then Flipper selection. Returning from settings continues automatically — there is no separate Start tap. Android 13+ notification posting permission is asked once, optionally, after starting and never blocks connection. Restricted settings on sideloaded applications are controlled through Android's own App info/settings UI.
+6. When Connect finds your Flipper, tap the device advertising the custom service in the list — selecting it starts the connection immediately. Confirm the matching system pairing code on both devices. Wait for READY, then play in Apple Music. Apple Music-only is the default; Auto or an explicitly observed player, elapsed/remaining, diagnostics export, and change/forget device live under Advanced (collapsed by default).
 
 ## Controls and lifecycle
 
@@ -24,11 +24,11 @@ Use `now_playing-fw1.4.3-api87.1.fap` with official Flipper firmware 1.4.3/expor
 
 Choose elapsed/remaining in the helper; the default is elapsed/total. Missing metadata/time remains visibly unknown. V1 normalizes display text to printable ASCII while retaining original Unicode text in the phone preview.
 
-Start must be pressed from the visible helper activity. The connectedDevice foreground service stays armed while that process lives, and reconnects to the chosen identity without background scanning. The ongoing notification includes Stop. After reboot, force-stop or process termination, open the helper and press Start again. No boot persistence or battery exemption is configured. Background volume, particularly Android 17, requires real-device validation.
+Start must be pressed from the visible helper activity (now the single Connect button). The connectedDevice foreground service stays armed while that process lives, and reconnects to the chosen identity without background scanning. The ongoing notification includes Stop. After reboot, force-stop or process termination, open the helper and press Start again. No boot persistence or battery exemption is configured. Background volume, particularly Android 17, requires real-device validation.
 
 ## Recovery and removal
 
-If pairing was rejected, open setup and Start explicitly to retry. If an app-specific bond becomes stale, exit the FAP first, stop the helper, forget **only the NP identity** in Android Bluetooth settings, and optionally remove **only** `/ext/apps_data/now_playing/bt.keys` using the authorized file browser while the FAP is inactive. Never delete the stock Bluetooth keys or unrelated apps_data directories.
+If pairing was rejected, open the helper and tap Connect explicitly to retry. If an app-specific bond becomes stale, exit the FAP first, stop the helper, forget **only the NP identity** in Android Bluetooth settings, and optionally remove **only** `/ext/apps_data/now_playing/bt.keys` using the authorized file browser while the FAP is inactive. Never delete the stock Bluetooth keys or unrelated apps_data directories.
 
 If default-profile restoration fails, the FAP deliberately remains loaded and retries with an error screen to avoid dangling callbacks. Preserve default bonds and report the failure; do not flash firmware or erase Bluetooth settings as a repair shortcut.
 
