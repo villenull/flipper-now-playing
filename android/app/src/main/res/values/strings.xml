@@ -15,6 +15,9 @@
  <string name="btn_forget">Forget Flipper</string>
  <string name="btn_player">Player: %1$s</string>
  <string name="btn_export">Export redacted diagnostics</string>
+ <string name="found_device">%1$s · %2$s</string>
+ <string name="checklist">%1$s Bluetooth   %2$s Media access   %3$s Flipper</string>
+ <string name="hint_running_status">%1$s %2$s</string>
  <string name="row_ok">✓</string>
  <string name="row_missing">○</string>
  <string name="check_bt">Bluetooth</string>
@@ -22,22 +25,12 @@
  <string name="check_flipper">Flipper</string>
  <string name="scanning">Looking for Now Playing on your Flipper… select it below. Scan stops automatically.</string>
  <string name="scan_error">Scan failed (%1$d). Check Bluetooth and tap Connect to retry.</string>
- <string name="no_device_hint">No Flipper selected yet.</string>
  <string name="selected_pair">Flipper selected · %1$s. Starting… confirm the matching pairing code on both devices if asked.</string>
- <string name="status_line">%1$s</string>
  <string name="device_line">Flipper: %1$s</string>
  <string name="track_hint">Open Apple Music and play a track — it appears here and on your Flipper.</string>
  <string name="none">none</string>
- <!-- legacy keys kept for compat -->
- <string name="ui_5">Grant Bluetooth access first</string>
- <string name="ui_6">Enable notification access first</string>
- <string name="ui_7">Select the device advertising Now Playing first</string>
- <string name="ui_8">Grant Bluetooth permissions first</string>
  <string name="ui_9">Enable Bluetooth and launch Now Playing on the Flipper</string>
- <string name="ui_10">Scanning for the dedicated Now Playing service…</string>
  <string name="ui_11">Bluetooth permission was revoked</string>
  <string name="ui_12">Bluetooth permission was revoked</string>
  <string name="ui_13">Diagnostic export failed</string>
- <string name="status">Bluetooth permission: %1$s\nNotification access: %2$s\nService: %3$s\nPlayer: %4$s\n%5$s</string>
- <string name="device">Selected device: %1$s</string>
 </resources>

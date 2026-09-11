@@ -134,7 +134,7 @@ class MainActivity: Activity() {
   }
  }
 
- private fun stopBridge() { stopScan();stopService(Intent(this,BridgeService::class.java)) }
+ private fun stopBridge() { stopScan();val intent=Intent(this,BridgeService::class.java);stopService(intent) }
 
  private fun pickPlayer() {
   val packages=listOf("com.apple.android.music","auto")+BridgeService.players
@@ -168,7 +168,7 @@ class MainActivity: Activity() {
    try {
     val address=result.device.address
     if(found.add(address)) list.addView(Button(this@MainActivity).apply {
-     text="${result.scanRecord?.deviceName?:"Now Playing"} · ${address.takeLast(5)}"
+     text=getString(R.string.found_device,result.scanRecord?.deviceName?:"Now Playing",address.takeLast(5))
      setOnClickListener {
       prefs.edit().putString("device",address).apply()
       this@MainActivity.hint.text=getString(R.string.selected_pair,address.takeLast(5))
@@ -207,9 +207,7 @@ class MainActivity: Activity() {
  private val refresh=object: Runnable { override fun run() {
   val btOk=needs().isEmpty();val mediaOk=access();val dev=device()
   val ok=getString(R.string.row_ok);val miss=getString(R.string.row_missing)
-  checkRow.text="${if(btOk)ok else miss} ${getString(R.string.check_bt)}   "+
-   "${if(mediaOk)ok else miss} ${getString(R.string.check_media)}   "+
-   "${if(dev!=null)ok else miss} ${getString(R.string.check_flipper)}"
+  checkRow.text=getString(R.string.checklist,if(btOk)ok else miss,if(mediaOk)ok else miss,if(dev!=null)ok else miss)
   deviceText.text=getString(R.string.device_line,dev?.takeLast(5)?:getString(R.string.none))
   val preview=BridgeService.preview
   trackText.text=if(preview.isNotEmpty())preview else getString(R.string.track_hint)
@@ -217,7 +215,7 @@ class MainActivity: Activity() {
   if(serviceRunning()) {
    primary.text=getString(R.string.btn_stop)
    if(hint.text.isNullOrEmpty()||hint.text.toString().startsWith("Tap Connect"))
-    hint.text=getString(R.string.hint_running)+" "+BridgeService.status
+    hint.text=getString(R.string.hint_running_status,getString(R.string.hint_running),BridgeService.status)
   } else {
    primary.text=getString(R.string.btn_connect)
    // Only overwrite the hint when it is not showing scan/selection progress.
