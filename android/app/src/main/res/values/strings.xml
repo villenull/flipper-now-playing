@@ -30,4 +30,17 @@
  <string name="ui_11">Bluetooth permission was revoked</string>
  <string name="ui_12">Bluetooth permission was revoked</string>
  <string name="ui_13">Diagnostic export failed</string>
+ <string name="tile_add">Add to Quick Settings</string>
+ <string name="tile_added">Now Playing is in Quick Settings. Tap to start or stop; hold to open setup.</string>
+ <string name="tile_add_manual">Swipe down twice, tap Edit (the pencil), then add Now Playing to your Quick Settings tiles.</string>
+ <string name="tile_off">Off</string>
+ <string name="tile_setup">Set up</string>
+ <string name="tile_connecting">Connecting</string>
+ <string name="tile_waiting">Waiting for Flipper</string>
+ <string name="tile_connected">Connected</string>
+ <string name="tile_bluetooth_off">Bluetooth off</string>
+ <string name="tile_attention">Check setup</string>
+ <string name="tile_description">%1$s: %2$s</string>
+ <string name="tile_starting">Starting Now Playing…</string>
+ <string name="tile_start_failed">Could not start the helper. Check Bluetooth access, then tap Connect to retry.</string>
 </resources>

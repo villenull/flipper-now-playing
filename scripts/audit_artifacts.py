@@ -8,7 +8,7 @@ def run(cmd):return subprocess.check_output(list(map(str,cmd)),text=True,env=env
 apk=root/'dist/flipper-now-playing-debug.apk'
 badging=run([tools/'aapt','dump','badging',apk]);permissions=run([tools/'aapt','dump','permissions',apk])
 assert "name='io.github.flippernowplaying.bridge'" in badging
-assert "versionCode='2'" in badging and "versionName='1.1'" in badging
+assert "versionCode='3'" in badging and "versionName='0.3'" in badging
 assert "sdkVersion:'26'" in badging and "targetSdkVersion:'36'" in badging
 for permission in ['INTERNET','ACCESS_BACKGROUND_LOCATION','QUERY_ALL_PACKAGES','RECORD_AUDIO','RECEIVE_BOOT_COMPLETED','MEDIA_CONTENT_CONTROL','BLUETOOTH_ADVERTISE']:
  assert 'android.permission.'+permission+"'" not in permissions,permission

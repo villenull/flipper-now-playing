@@ -6,7 +6,7 @@ root=Path(__file__).resolve().parents[1]
 def source_digest():
  files=[root/'.toolchains.lock.json']
  for folder in ['android','flipper','protocol','scripts','tests']:
-  files.extend(p for p in (root/folder).rglob('*') if p.is_file() and not any(x in p.parts for x in ['build','.gradle','__pycache__']) and p.name!='local.properties')
+  files.extend(p for p in (root/folder).rglob('*') if p.is_file() and not any(x in p.parts for x in ['build','.gradle','.kotlin','__pycache__']) and p.name!='local.properties')
  h=hashlib.sha256()
  for p in sorted(files):h.update(str(p.relative_to(root)).encode()+b'\0'+p.read_bytes())
  return h.hexdigest()

@@ -24,7 +24,7 @@ Use `now_playing-fw1.4.3-api87.1.fap` with official Flipper firmware 1.4.3/expor
 
 Choose elapsed/remaining in the helper; the default is elapsed/total. Missing metadata/time remains visibly unknown. V1 normalizes display text to printable ASCII while retaining original Unicode text in the phone preview.
 
-Start must be pressed from the visible helper activity (now the single Connect button). The connectedDevice foreground service stays armed while that process lives, and reconnects to the chosen identity without background scanning. The ongoing notification includes Stop. After reboot, force-stop or process termination, open the helper and press Start again. No boot persistence or battery exemption is configured. Background volume, particularly Android 17, requires real-device validation.
+Start from Connect in the helper or tap the Now Playing Quick Settings tile. The tile briefly shows a visible Starting screen until the service enters foreground, then returns to the previous app. The connectedDevice foreground service stays armed while that process lives, and reconnects to the chosen identity without background scanning. The ongoing notification includes Stop. After reboot or process termination, start again from the tile or Connect. After force-stop, reopen the helper if the system disables its tile. No boot persistence or battery exemption is configured. Background volume, particularly Android 17, requires real-device validation.
 
 ## Recovery and removal
 
@@ -52,3 +52,18 @@ Review https://developer.android.com/studio/terms before supplying the license f
 Stop the Android helper, install the new debug APK over the existing one, then press Start. The application ID and development signing key are unchanged; versionCode is 2. Update the FAP while it is closed. Both 1.1 applications are needed for artwork; either can still negotiate application version 1 with an older peer and use the no-artwork layout.
 
 Album artwork is a 45×45 one-bit image. Title, artist and album stay at the beginning for five seconds before independently scrolling if too wide; they pause 1.5 seconds at the end. The button legend is removed, but all keys and long Back exit work as before. Missing or inaccessible artwork shows a music note. Embedded metadata bitmaps and readable local content URIs are supported; the helper never downloads HTTP artwork.
+
+## Update to v0.3 (Quick Settings)
+
+Install the v0.3 debug APK over the earlier Now Playing helper. The package and certificate are preserved, with versionCode 3/versionName 0.3. Existing artwork-capable Flipper installations do not need replacement for this Android-only feature.
+
+Open the helper and tap **Add to Quick Settings**. Android 13+ shows a system confirmation. On Android 8–12, swipe down twice, tap Edit/the pencil, and drag **Now Playing** into your active tiles. Declining the prompt leaves manual addition available.
+
+- Tap an off tile to start the saved connection. A brief **Starting Now Playing…** screen provides a visible foreground-service start, then closes automatically.
+- Missing permissions or a missing Flipper selection open the existing setup flow.
+- Tap an enabled tile to stop. It stays highlighted when waiting/reconnecting or Bluetooth is off, so you can always stop the armed session.
+- Long-press opens setup/settings without starting the helper.
+- Starting from a locked phone requires unlocking. Stopping is available while locked. The tile displays connection state only, never song metadata.
+- Closing the shade or removing the tile does not stop the helper. Use the tile, app, or notification Stop control.
+
+For upgrade-compatible local builds, set `NP_DEBUG_KEYSTORE` to your existing development keystore when running the build. Never share or commit that file. A default local/CI debug certificate is not automatically the published certificate.

@@ -15,3 +15,6 @@ Do not infer compatibility with firmware forks, other API versions, every Androi
 ## 1.1 artwork extension
 
 Android versionCode 2/versionName 1.1 and Flipper FAP 1.1 negotiate application version 2 for album artwork. Legacy version-1 peers remain compatible without artwork. BLE UUIDs, app ID, key path and Android signing identity remain unchanged. Screen width is unchanged: 45×45 cover plus three metadata rows, and a five-second leading pause for overflow. The device available locally uses Momentum mntm-012/API87.1; startup of the SD-corrected 1.0 app was observed, but official-firmware and complete phone/media acceptance remain open.
+
+## v0.3 Quick Settings
+Android min26/target36 retained. The tile is compiled for API26+; Add to Quick Settings system prompt uses API33+, with manual addition below33. PendingIntent activity launch is used on API34+. Original certificate and package retained with versionCode3/name0.3. Physical tile/system-UI and Android17 audio acceptance remain NOT_RUN for this update; see HARDWARE_VALIDATION.md. Existing artwork-capable FAP remains usable.

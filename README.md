@@ -4,13 +4,13 @@
 
 **Your music, on your Flipper.** Album artwork, live track information, and pocket-sized playback controls.
 
-**Bluetooth · Media** &nbsp; | &nbsp; **Release v0.2** &nbsp; | &nbsp; **Flipper Zero + Android 8.0+**
+**Bluetooth · Media** &nbsp; | &nbsp; **Release v0.3** &nbsp; | &nbsp; **Flipper Zero + Android 8.0+**
 
 ### Download & install
 
-**[⬇ Download the Android APK](https://github.com/villenull/flipper-now-playing/releases/download/v0.2/flipper-now-playing-debug.apk)** — open this link on your phone, download, and tap to install.
+**[⬇ Download the Android APK](https://github.com/villenull/flipper-now-playing/releases/download/v0.3/flipper-now-playing-debug.apk)** — open this link on your phone, download, and tap to install.
 
-**[⬇ Download the Flipper app (.fap)](https://github.com/villenull/flipper-now-playing/releases/download/v0.2/now_playing-fw1.4.3-api87.1.fap)** · [All release files](https://github.com/villenull/flipper-now-playing/releases/tag/v0.2) · [Detailed installation guide](docs/INSTALL.md)
+**[⬇ Download the Flipper app (.fap)](https://github.com/villenull/flipper-now-playing/releases/download/v0.3/now_playing-fw1.4.3-api87.1.fap)** · [All release files](https://github.com/villenull/flipper-now-playing/releases/tag/v0.3) · [Detailed installation guide](docs/INSTALL.md)
 
 > **Preview release.** Built for official Flipper firmware **1.4.3 / API 87.1**. Hardware acceptance is still in progress. Update both the APK and FAP for artwork. The APK can update the previous helper in place.
 
@@ -39,10 +39,10 @@ Apple Music and the official Flipper Android app stay unchanged. This is a separ
 1. **Install the Android helper.** Download the APK above on your phone and tap it. If Android prompts, allow installation from your browser. To update, stop the helper first and install over the existing version.
 2. **Copy the Flipper app.** With Now Playing closed, use qFlipper to copy the FAP to `SD Card/apps/Bluetooth/now_playing.fap`. No firmware flashing is involved.
 3. **Open Now Playing on the Flipper.** Go to **Apps → Bluetooth → Now Playing**. Disconnect any active management connection in the official Flipper Android app.
-4. **Connect from the helper.** Grant Bluetooth and notification access, tap **Find Now Playing devices**, select your device, and tap **Start**. Confirm the matching pairing code on both devices.
+4. **Connect from the helper.** Tap **Connect**, grant Bluetooth and media access, then select your Flipper. Confirm the matching pairing code on both devices. Tap **Add to Quick Settings** to add the everyday toggle.
 5. **Play a song.** Start playback in Apple Music. Track information will appear once the connection is ready.
 
-The helper's ongoing notification includes **Stop**. After a reboot or force-stop, open the helper and press Start again. For Android's sideloaded-app settings and troubleshooting, see the [installation guide](docs/INSTALL.md).
+The **Now Playing** Quick Settings tile starts and stops the helper. It stays highlighted while enabled, including while waiting for the Flipper. Turning it on briefly shows a Starting screen; no second tap is needed. Long-press the tile for setup and settings. On Android 8–12, add the tile using the Quick Settings Edit/pencil button. The ongoing notification also includes **Stop**. After a reboot or process termination, start again from the tile or the app; after force-stop, reopen the app if Android disables the tile. For Android's sideloaded-app settings and troubleshooting, see the [installation guide](docs/INSTALL.md).
 
 ## Controls
 
@@ -73,11 +73,20 @@ The connected **Momentum mntm-012 / API 87.1** device accepted the FAP and was r
 
 ## Validation status
 
-The local build passes **30 reference tests**, **17 Kotlin/Android unit tests**, **C ASan/UBSan**, **722 valid + 731 malformed cross-language cases**, Android lint, eleven native screen checks, and five actual artwork-reader tests on an Android emulator. USB installation on the connected Flipper was verified by reading the file back.
+The local build passes **30 reference tests**, **22 Kotlin/Android unit tests**, **C ASan/UBSan**, **722 valid + 731 malformed cross-language cases**, Android lint and eleven native screen checks. Five artwork-reader emulator checks and Flipper USB readback are recorded for earlier builds; they were not rerun for v0.3. No phone or emulator was attached for this update.
 
-**Still awaiting physical acceptance:** phone-to-Flipper artwork, pairing and rapid track changes, background/Android 17 volume, bond preservation, and endurance. [Build report](docs/BUILD_REPORT.md) · [Hardware checklist](docs/HARDWARE_VALIDATION.md) · [Checksums](https://github.com/villenull/flipper-now-playing/releases/download/v0.2/SHA256SUMS)
+**Still awaiting physical acceptance:** phone-to-Flipper artwork, pairing and rapid track changes, background/Android 17 volume, bond preservation, and endurance. [Build report](docs/BUILD_REPORT.md) · [Hardware checklist](docs/HARDWARE_VALIDATION.md) · [Checksums](https://github.com/villenull/flipper-now-playing/releases/download/v0.3/SHA256SUMS)
 
 ## Changelog
+
+### v0.3
+
+- Add a Quick Settings On/Off tile with connection status and long-press setup.
+- Add an Android 13+ system prompt to pin the tile; older versions use Quick Settings Edit.
+- Keep a brief visible start screen until the connection service enters foreground.
+- Share permission checks and distinguish an enabled helper from a connected radio.
+- Preserve the development signing certificate; Android versionCode 3/versionName 0.3.
+- Physical Quick Settings and locked-screen acceptance remain pending.
 
 ### v0.2
 

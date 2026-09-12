@@ -1,4 +1,21 @@
-# Hardware validation — NOT_RUN / BLOCKED
+# Current device validation — v0.3 Quick Settings
+
+2026-09-12: authorized read-only ADB inventory returned no attached devices. New Quick Settings behavior has no device PASS claim. Prior emulator/Flipper observations below are historical and apply only to the earlier artifacts. No device installation or firmware changes were performed for v0.3.
+
+Pending checks on API26/30, API33, API34/36 and API37 when available:
+
+1. Upgrade v0.2 in place; confirm retained device/player settings and original certificate.
+2. Add via Android13+ system prompt; decline and add manually. On older Android use the pencil/Edit panel.
+3. With setup missing, tap tile and complete permissions/device selection. Long-press only opens settings.
+4. With saved setup, tap On: one short Starting screen, service notification appears, screen closes. Check Connecting, Waiting, Connected, Bluetooth off and repair statuses without exposing metadata.
+5. Tap Off while connected, reconnecting, Bluetooth off, and after access revocation. Confirm service, notification and reconnect work stop.
+6. Lock phone: starting requests unlock; cancel leaves helper off. Stopping works while locked. Validate audible volume after tile-start and relock, especially API37.
+7. Rapid taps, rotation/Back during start, shade close/reopen, remove/re-add tile and process death must not duplicate starts, restart a stopped service or leave a stale On tile. After force-stop, reopen app as Android requires.
+8. Run the existing Apple Music, headset, reconnect and default-bond acceptance below with recorded APK/FAP hashes.
+
+## Historical hardware evidence (pre-v0.3)
+
+# Initial environment — NOT_RUN / BLOCKED
 
 No supported Android/Flipper pair was available. No APK or FAP was installed on any attached device, and no firmware, pairing, media, application data or settings were changed.
 

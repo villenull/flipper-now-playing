@@ -18,7 +18,7 @@ evidence=dist/'evidence';evidence.mkdir(exist_ok=True)
 for p in (root/'build/evidence').iterdir():
  if p.is_file() and p.suffix in ['.log','.json','.txt']:shutil.copyfile(p,evidence/p.name)
 archive=dist/'flipper-now-playing-source.zip'
-exclude={'.cache','.git','.agents','.codex','.gradle','__pycache__','dist','build'}
+exclude={'.cache','.git','.agents','.codex','.gradle','.kotlin','__pycache__','dist','build'}
 files=[p for p in root.rglob('*') if p.is_file() and not any(part in exclude for part in p.relative_to(root).parts) and p.name!='local.properties']
 with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:
  for p in sorted(files):
@@ -26,7 +26,9 @@ with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:
   info=zipfile.ZipInfo(str(p.relative_to(root)),date_time=(2026,9,9,0,0,0));info.external_attr=(p.stat().st_mode&0xffff)<<16
   z.writestr(info,p.read_bytes(),compress_type=zipfile.ZIP_DEFLATED)
 lock=json.load(open('.toolchains.lock.json'))
-manifest={'project':'Now Playing','version':'0.1','source_commit':None,'source_identity':validation['source_digest'],'source_commit_note':'Managed supplied workspace is not a usable Git checkout; source archive and digest identify this build.','build_utc':datetime.now(timezone.utc).isoformat(),'protocol':'FNP/1 envelope; application versions 1 and 2','toolchains':lock,'android':{'application_id':'io.github.flippernowplaying.bridge','version_code':2,'debug_signing':'development debug certificate (verified)','release_signing':'unsigned'},'validation':validation,'artifacts':[]}
+try: source_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True,stderr=subprocess.DEVNULL).strip()
+except (subprocess.CalledProcessError,FileNotFoundError): source_commit=None
+manifest={'project':'Now Playing','version':'0.3','source_commit':source_commit,'source_identity':validation['source_digest'],'source_commit_note':'Git commit when available; source archive and digest identify the build even outside a checkout.','build_utc':datetime.now(timezone.utc).isoformat(),'protocol':'FNP/1 envelope; application versions 1 and 2','toolchains':lock,'android':{'application_id':'io.github.flippernowplaying.bridge','version_code':3,'debug_signing':'development debug certificate (verified)','release_signing':'unsigned'},'validation':validation,'artifacts':[]}
 for p in sorted(dist.rglob('*')):
  if p.is_file() and p.name not in ['manifest.json','SHA256SUMS']:
   assert p.suffix not in ['.jks','.keystore','.keys']

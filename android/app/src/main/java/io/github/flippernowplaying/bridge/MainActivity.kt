@@ -45,18 +45,10 @@ class MainActivity: Activity() {
  private var pendingAuto=false
  private val prefs by lazy { getSharedPreferences("settings",MODE_PRIVATE) }
 
- private fun needs(): Array<String> = PermissionPolicy.bluetooth(Build.VERSION.SDK_INT)
-  .filter { checkSelfPermission(it)!=PackageManager.PERMISSION_GRANTED }.toTypedArray()
-
- private fun access(): Boolean {
-  val component=ComponentName(this,MediaAccessService::class.java)
-  return if(Build.VERSION.SDK_INT>=27) getSystemService(NotificationManager::class.java)
-   .isNotificationListenerAccessGranted(component)
-  else Settings.Secure.getString(contentResolver,"enabled_notification_listeners")
-   .orEmpty().split(':').mapNotNull(ComponentName::unflattenFromString).contains(component)
- }
-
- private fun serviceRunning(): Boolean = BridgeService.status!="STOPPED"
+ companion object { const val EXTRA_TILE_SETUP = "tile_setup" }
+ private fun needs() = BridgeSetup.missingBluetooth(this)
+ private fun access() = BridgeSetup.mediaAccess(this)
+ private fun serviceRunning() = BridgeService.enabled
  private fun device(): String? = prefs.getString("device",null)
  private fun playerLabel(): String = when(prefs.getString("player","com.apple.android.music")) {
   "auto"->"Auto"; "com.apple.android.music"->"Apple Music"; else->"Custom"
@@ -75,6 +67,10 @@ class MainActivity: Activity() {
   root.addView(primary)
   hint=TextView(this);root.addView(hint)
 
+  root.addView(Button(this).apply {
+   text=getString(R.string.tile_add)
+   setOnClickListener { addQuickSettingsTile() }
+  })
   deviceText=TextView(this);root.addView(deviceText)
   trackText=TextView(this);root.addView(trackText)
 
@@ -123,7 +119,9 @@ class MainActivity: Activity() {
 
  private fun startBridge() {
   pendingAuto=false;stopScan()
-  startForegroundService(Intent(this,BridgeService::class.java))
+  try { startForegroundService(Intent(this,BridgeService::class.java)) }
+  catch(_:IllegalStateException) { hint.text=getString(R.string.tile_start_failed);return }
+  catch(_:SecurityException) { hint.text=getString(R.string.tile_start_failed);return }
   // Opportunistic, non-blocking: connection notifications are nice but
   // denial must not block media access (spec 3.2).
   if(PermissionPolicy.notificationRuntime(Build.VERSION.SDK_INT) &&
@@ -194,8 +192,28 @@ class MainActivity: Activity() {
   else if(needs().isNotEmpty())hint.text=getString(R.string.hint_bt)
  }
 
+ private fun addQuickSettingsTile() {
+  if(Build.VERSION.SDK_INT >= 33) {
+   getSystemService(android.app.StatusBarManager::class.java).requestAddTileService(
+    ComponentName(this,NowPlayingTileService::class.java),getString(R.string.ui_1),
+    android.graphics.drawable.Icon.createWithResource(this,R.drawable.ic_tile_note),mainExecutor) { result ->
+     val message=when(result) {
+      android.app.StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED,
+      android.app.StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED -> R.string.tile_added
+      else -> R.string.tile_add_manual
+     }
+     Toast.makeText(this,message,Toast.LENGTH_LONG).show()
+    }
+  } else Toast.makeText(this,R.string.tile_add_manual,Toast.LENGTH_LONG).show()
+ }
+
  override fun onResume() {
   super.onResume();h.post(refresh)
+  if(intent.getBooleanExtra(EXTRA_TILE_SETUP,false)) {
+   intent.removeExtra(EXTRA_TILE_SETUP)
+   // Only a tile setup tap advances permissions; long-press preferences never starts playback.
+   if(!serviceRunning()) { onPrimary();return }
+  }
   // Auto-continue after the user returns from system settings.
   if(pendingAuto&&!serviceRunning()&&needs().isEmpty()&&access()) {
    if(device()!=null)startBridge()

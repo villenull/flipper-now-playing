@@ -8,25 +8,28 @@ import io.github.flippernowplaying.core.*
 
 class BridgeService: Service() {
  companion object {
+  @Volatile var enabled=false;private set
+  internal val observers=java.util.concurrent.CopyOnWriteArraySet<() -> Unit>()
   @Volatile var status="STOPPED";private set
   @Volatile var preview="";private set
   @Volatile var players=listOf<String>();private set
   @Volatile private var instance: BridgeService?=null
   private val diagnostics=ArrayDeque<String>()
-  @Synchronized fun report(): String = "Now Playing 1.1\nAndroid API ${Build.VERSION.SDK_INT}\n"+diagnostics.joinToString("\n")
+  @Synchronized fun report(): String = "Now Playing 0.3\nAndroid API ${Build.VERSION.SDK_INT}\n"+diagnostics.joinToString("\n")
   fun accessChanged(available: Boolean) { instance?.let { s -> s.h.post { if(available)s.media.start() else s.media.revoke() } } }
   fun settingsChanged() { instance?.let { s->s.h.post { s.media.refresh();s.publish(true) } } }
  }
  private lateinit var thread: HandlerThread;private lateinit var h: Handler;private lateinit var media: MediaSessionRepository
  private var ble: BleConnectionManager?=null;private val commands=CommandRouter();private val seq=ConnectionCounter()
- private var lastEpoch=-1L;private var lastRevision=-1L;private var armed=false
+ private var lastEpoch=-1L;private var lastRevision=-1L;@Volatile private var armed=false
  private fun now()=SystemClock.elapsedRealtime()
  private fun notification(text: String): Notification {
   val open=PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
   val stop=PendingIntent.getService(this,1,Intent(this,BridgeService::class.java).setAction("STOP"),PendingIntent.FLAG_IMMUTABLE)
   return Notification.Builder(this,"bridge").setSmallIcon(android.R.drawable.stat_sys_data_bluetooth).setContentTitle("Now Playing").setContentText(text).setContentIntent(open).setOngoing(true).setVisibility(Notification.VISIBILITY_PRIVATE).addAction(Notification.Action.Builder(null,"Stop",stop).build()).build()
  }
- private fun update(s: String) { status=s;synchronized(Companion) { diagnostics.addLast("${now()} $s");while(diagnostics.size>100)diagnostics.removeFirst() }
+ private fun update(s: String) { if(instance !== this || !armed)return
+  status=s;observers.forEach { it() };synchronized(Companion) { diagnostics.addLast("${now()} $s");while(diagnostics.size>100)diagnostics.removeFirst() }
   if(armed) { try { getSystemService(NotificationManager::class.java).notify(1,notification(s)) } catch(_:SecurityException) { } }
  }
  override fun onCreate() {
@@ -39,8 +42,9 @@ class BridgeService: Service() {
   if(armed)return START_NOT_STICKY
   try {
    if(Build.VERSION.SDK_INT>=29)startForeground(1,notification("Starting"),ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE) else startForeground(1,notification("Starting"))
-  } catch(_:SecurityException) { update("NEEDS_PERMISSION: open setup and grant Bluetooth");stopSelf();return START_NOT_STICKY }
-  armed=true
+  } catch(_:SecurityException) { startFailed();return START_NOT_STICKY }
+  catch(_:IllegalStateException) { startFailed();return START_NOT_STICKY }
+  armed=true;enabled=true;update("STARTING")
   h.post {
    val address=getSharedPreferences("settings",MODE_PRIVATE).getString("device",null)
    if(address==null) { update("Select a Now Playing device in setup");stopSelf();return@post }
@@ -60,6 +64,11 @@ class BridgeService: Service() {
    h.postDelayed(periodic,10000);h.postDelayed(heartbeat,15000)
   }
   return START_NOT_STICKY
+ }
+ private fun startFailed() {
+  status="NEEDS_PERMISSION: open setup and tap Connect"
+  observers.forEach { it() }
+  stopSelf()
  }
  private var lastRequest=0L
  private fun nextSeq(): Long = seq.next()
@@ -82,7 +91,7 @@ class BridgeService: Service() {
  private val periodic=object: Runnable { override fun run() { if(!armed)return;media.refresh();publish(false);h.postDelayed(this,10000) } }
  private val heartbeat=object: Runnable { override fun run() { if(!armed)return;ble?.enqueue(64,{ Protocol.buffer(4).putInt(now().toInt()).array() });h.postDelayed(this,15000) } }
  override fun onDestroy() {
-  instance=null;armed=false
+  instance=null;armed=false;enabled=false;status="STOPPED";observers.forEach { it() }
   h.post { h.removeCallbacksAndMessages(null);ble?.stop();media.close();commands.reset();thread.quitSafely() }
   stopForeground(STOP_FOREGROUND_REMOVE);status="STOPPED";preview="";super.onDestroy()
  }
