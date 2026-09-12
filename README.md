@@ -14,6 +14,8 @@
 
 > **Preview release.** Built for official Flipper firmware **1.4.3 / API 87.1**. Hardware acceptance is still in progress. Update both the APK and FAP for artwork. The APK can update the previous helper in place.
 
+> **Also available: one Flipper Now helper for both companions.** It pairs Now Playing plus the [Flipper Next Turn](https://github.com/villenull/flipper-next-turn) navigator (`NT…` advert) from a single app with one-tap pairing: [⬇ Download Flipper Now](https://github.com/villenull/flipper-next-turn/releases/download/v1.0/flipper-now-debug.apk). Same signing identity, so it upgrades this helper in place.
+
 ## Screen preview
 
 ![Now Playing orange concept render with album artwork on the left and track details on the right](docs/media/now-playing-concept-orange.png)
