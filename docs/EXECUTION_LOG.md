@@ -109,3 +109,18 @@ Build and host results do not establish physical pairing, bond restoration, Appl
 
 - Final pipeline exit0:30 reference,22 Kotlin/module unit tests (including5 tile-policy), C ASan/UBSan,11 renderer states,722 valid/731 malformed codec cases, lint No issues found, APKs/FAP built and76 imports audited. Source digest 25ec7cc40e1a33fb356f537932b7478f79a68aaebd30680efc0fb6fb59cdf6bb. APK certificate matches original. Compiled-manifest inspection confirms tile permission/non-exported start activity/preference action.
 - Packaging v0.3 with source, evidence, original-signed installable APK, unsigned APK and compatible rebuilt FAP. No device writes. Next: commit/push current changes, publish GitHub v0.3 and verify downloaded APK byte equality.
+
+## v0.3 APK publication — complete, broader source publication pending
+- Local source commit baef6dfac306a6cb26c4f51903ca5f5f609963e1 created using the repository's existing author identity per-command (no global Git change). First commit command failed because author identity was unset; retry exit0. Local package audit passed49 manifest hashes and source-cache/key exclusions.
+- Automatic approval review rejected the combined main push/source/evidence/APK upload as beyond the user's APK-download authorization. No remote mutation occurred from that command. Asked user separately for broader source/evidence publication; answer pending.
+- Safer narrowed action approved: `gh release create v0.3` with only installable APK and its checksum, no source push/evidence upload, exit0. Release tag intentionally points to existing public base289ca836cf65008300c13cdd0b3e9875ec156adb; release notes explicitly distinguish that base from the unpublished tile source baef6df. Do not claim GitHub main/tag contain the tile source.
+- Release: https://github.com/villenull/flipper-now-playing/releases/tag/v0.3 . Unauthenticated curl download and cmp against tested APK both exit0; SHA2567eae1472c0ebc81aa9d8a8e962a800968cc15eb30d354f1f187e4203e5a1ab6c. Public v0.2 certificate independently matched new APK, with versionCode increasing2→3.
+- User-facing APK delivery complete. Source/evidence remain local pending requested approval; physical tile/BLE/Android17 testing remains NOT_RUN. If user approves broader publication, push the source commit, attach audited source/evidence, and reconcile release source provenance explicitly without silently rewriting public tags.
+
+## v0.3 source and evidence publication — complete
+- User explicitly approved pushing tested source baef6df and publishing source and test evidence to the existing public repository.
+- Rechecked validation digest and artifact hashes; archive integrity/cache/key-exclusion checks passed. No runtime/build inputs changed and no rebuild was needed.
+- `git push origin main`: exit 0, public main advanced from 289ca83 to baef6dfac306a6cb26c4f51903ca5f5f609963e1. `gh release upload v0.3` and release-notes edit: exit 0. Uploaded audited source ZIP, software evidence ZIP, manifest, SHA256SUMS, unsigned release APK and rebuilt compatible FAP. Existing tested installable APK remains unchanged.
+- Unauthenticated public downloads of source/evidence/manifest/SHA256SUMS each byte-match local audited files (exit 0). GitHub branch query confirmed the tested implementation commit.
+- The existing v0.3 tag remains on its original public base; release notes prominently link the corresponding baef6df source commit and attached source archive instead of implying the automatic tag archives contain the tile. No public tag was rewritten.
+- Publication complete: https://github.com/villenull/flipper-now-playing/releases/tag/v0.3 . Physical tile/phone/Flipper and Android17 checks remain pending as documented.
